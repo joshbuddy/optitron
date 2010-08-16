@@ -4,6 +4,7 @@ class Optitron
   autoload :Parser,    'optitron/parser'
   autoload :Response,  'optitron/response'
   autoload :Option,    'optitron/option'
+  autoload :Help,      'optitron/help'
 
   InvalidParser = Class.new(RuntimeError)
 
@@ -27,7 +28,6 @@ class Optitron
     optitron.parser.target = target
     optitron.parser.parse(args).dispatch
   end
-
 
   def help
     @parser.help
