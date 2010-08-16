@@ -7,6 +7,8 @@ class Optitron
 
   InvalidParser = Class.new(RuntimeError)
 
+  attr_reader :parser
+
   def initialize(&blk)
     @parser = Parser.new
     Dsl.new(@parser, &blk) if blk
@@ -19,6 +21,13 @@ class Optitron
   def self.transform(args = ARGV, &blk)
     Optitron.new(&blk).parse(args)
   end
+
+  def self.dispatch(target = nil, args = ARGV, &blk)
+    optitron = Optitron.new(&blk)
+    optitron.parser.target = target
+    optitron.parser.parse(args).dispatch
+  end
+
 
   def help
     @parser.help

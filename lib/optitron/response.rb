@@ -2,8 +2,8 @@ class Optitron
   class Response
     attr_reader :params_array, :args, :params, :args_with_tokens, :errors
     attr_accessor :command
-    def initialize(tokens)
-      @tokens = tokens
+    def initialize(parser, tokens)
+      @parser, @tokens = parser, tokens
       @params_array = []
       @args_with_tokens = []
       @args = []
@@ -56,15 +56,16 @@ class Optitron
       end
     end
 
-    def dispatch(obj)
+    def dispatch
+      raise unless @parser.target
       if valid?
         dispatch_args = params.empty? ? args : args + [params]
-        obj.send(command.to_sym, *dispatch_args)
+        @parser.target.send(command.to_sym, *dispatch_args)
       else
         raise
       end
     end
-    
+
     def valid?
       @errors.empty?
     end

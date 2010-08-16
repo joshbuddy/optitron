@@ -1,5 +1,6 @@
 class Optitron
   class Parser
+    attr_accessor :target
     attr_reader :commands, :options, :args
     def initialize
       @options = []
@@ -9,7 +10,7 @@ class Optitron
 
     def parse(args = ARGV)
       tokens = Tokenizer.new(args).tokens
-      response = Response.new(tokens)
+      response = Response.new(self, tokens)
       options = @options 
       args = @args
       if !@commands.empty?
