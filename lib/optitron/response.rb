@@ -62,7 +62,9 @@ class Optitron
         dispatch_args = params.empty? ? args : args + [params]
         @parser.target.send(command.to_sym, *dispatch_args)
       else
-        raise
+        puts @parser.help
+        puts "\nErrors:"
+        puts error_messages.join("\n")
       end
     end
 

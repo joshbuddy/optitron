@@ -66,27 +66,73 @@ If you try parsing invalid parameters, get back friendly error messages
 
 == Usage in a binary
 
-To use this in a file, create a parser, and tell it to dispatch to your favourite object. For instance:
+To use this in a file, create a parser, and tell it to dispatch to your favourite object. For instance, save this down to <tt>test.rb</tt>
 
+  class Runner
+    def install(file, opts)
+      puts "installing #{file} with #{opts}!"
+    end
+  end
 
+  Optitron.dispatch(Runner.new) {
+    opt 'verbose', "Be very loud"
+    cmd "install", "This installs things" do
+      arg "file", "The file to install"
+    end
+    cmd "show", "This shows things" do
+      arg "first", "The first thing to show"
+      arg "second", "The second optional thing to show", :required => false
+    end
+    cmd "kill", "This kills things" do
+      opt "pids", "A list of pids to kill", :type => :array
+      opt "pid", "A pid to kill", :type => :numeric
+      opt "names", "Some sort of hash", :type => :hash
+    end
+    cmd "join", "This joins things" do
+      arg "thing", "Stuff to join", :type => :greedy
+    end
+  }
+
+Now, try running it.
+
+  crapbook-pro:optitron joshua$ ruby test.rb 
+  Commands
   
+  show [first] <second>          # This shows things
+  install [file]                 # This installs things
+  kill                           # This kills things
+    -p/--pids=[ARRAY]            # A list of pids to kill
+    -P/--pid=[NUMERIC]           # A pid to kill
+    -n/--names=[HASH]            # Some sort of hash
+  join [thing1 thing2 ...]       # This joins things
+  
+  Global options
+  
+  -v/--verbose                   # Be very loud
+  
+  Errors:
+  Unknown command
+  
+  crapbook-pro:optitron joshua$ ruby test.rb install
+  Commands
+  
+  show [first] <second>          # This shows things
+  install [file]                 # This installs things
+  kill                           # This kills things
+    -p/--pids=[ARRAY]            # A list of pids to kill
+    -P/--pid=[NUMERIC]           # A pid to kill
+    -n/--names=[HASH]            # Some sort of hash
+  join [thing1 thing2 ...]       # This joins things
+  
+  Global options
+  
+  -v/--verbose                   # Be very loud
+  
+  Errors:
+  File is required
+  
+  crapbook-pro:optitron joshua$ ruby test.rb install file
+  installing file with {"verbose"=>false}!
 
-@parser = Optitron.dispatch() {
-  opt 'verbose', "Be very loud"
-  cmd "install", "This installs things" do
-    arg "file", "The file to install"
-  end
-  cmd "show", "This shows things" do
-    arg "first", "The first thing to show"
-    arg "second", "The second optional thing to show", :required => false
-  end
-  cmd "kill", "This kills things" do
-    opt "pids", "A list of pids to kill", :type => :array
-    opt "pid", "A pid to kill", :type => :numeric
-    opt "names", "Some sort of hash", :type => :hash
-  end
-  cmd "join", "This joins things" do
-    arg "thing", "Stuff to join", :type => :greedy
-  end
-}
-
+  crapbook-pro:optitron joshua$ ruby test.rb install file --verbose true
+  installing file with {"verbose"=>true}!
