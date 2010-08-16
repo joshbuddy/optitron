@@ -1,16 +1,17 @@
 class Optitron
   class Parser
-    attr_reader :commands, :options
+    attr_reader :commands, :options, :args
     def initialize
       @options = []
       @commands = {}
+      @args = []
     end
 
     def parse(args = ARGV)
       tokens = Tokenizer.new(args).tokens
       response = Response.new(tokens)
       options = @options 
-      args = nil
+      args = @args
       if !@commands.empty?
         potential_cmd_toks = tokens.select { |t| t.respond_to?(:val) }
         if cmd_tok = potential_cmd_toks.find { |t| @commands[t.val] }
@@ -44,59 +45,79 @@ class Optitron
       args.each { |arg| arg.consume(response, tokens) } if args
     end
 
+    def help_line_for_opt(opt)
+      opt_line = ''
+      opt_line << [opt.short_name ? "-#{opt.short_name}" : nil, "--#{opt.name}"].compact.join('/')
+      opt_line << "=[#{opt.type.to_s.upcase}]" if opt.type != :boolean
+      [opt_line, opt.desc]
+    end
+
+    def help_line_for_arg(arg)
+      arg_line = ''
+      arg_line << (arg.required? ? '[' : '<')
+      if arg.type == :greedy
+        arg_line << arg.name << '1 ' << arg.name << '2 ...' 
+      else
+        arg_line << arg.name
+      end
+      arg_line << (arg.required? ? ']' : '>')
+      arg_line
+    end
+
     def help
       cmds = {}
       @commands.each do |cmd_name, cmd|
         cmd_line = "#{cmd_name}"
         cmd.args.each do |arg|
-          cmd_line << " "
-          cmd_line << (arg.required? ? '[' : '<')
-          if arg.type == :greedy
-            cmd_line << arg.name << '1 ' << arg.name << '2 ...' 
-          else
-            cmd_line << arg.name
-          end
-          cmd_line << (arg.required? ? ']' : '>')
+          cmd_line << " " << help_line_for_arg(arg)
         end
         cmds[cmd_line] = [cmd.desc]
         cmd.options.each do |opt|
-          opt_line = ''
-          opt_line << [opt.short_name ? "-#{opt.short_name}" : nil, "--#{opt.name}"].compact.join('/')
-          opt_line << "=[#{opt.type.to_s.upcase}]" if opt.type != :boolean
-          cmds[cmd_line] << [opt_line, opt.desc]
+          cmds[cmd_line] << help_line_for_opt(opt)
         end
       end
       opts_lines = @options.map do |opt|
-        opt_line = ''
-        opt_line << [opt.short_name ? "-#{opt.short_name}" : nil, "--#{opt.name}"].compact.join('/')
-        opt_line << "=[#{opt.type.to_s.upcase}]" if opt.type != :boolean
-        [opt_line, opt.desc]
+        help_line_for_opt(opt)
       end
 
-      longest_line = cmds.keys.map{|k| k.size}.max
+      args_lines = args.empty? ? nil : [args.map{|arg| help_line_for_arg(arg)}.join(' '), args.map{|arg| arg.desc}.join(', ')]
+
+      longest_line = 0
+      longest_line = [longest_line, cmds.keys.map{|k| k.size}.max].max unless cmds.empty?
       opt_lines = cmds.map{|k,v| k.size + 2}.flatten
+      longest_line = [longest_line, args_lines.first.size].max if args_lines
       longest_line = [longest_line, opt_lines.max].max unless opt_lines.empty?
       longest_line = [opts_lines.map{|o| o.first.size}.max, longest_line].max unless opts_lines.empty?
-      help_output = "Commands\n\n" + cmds.map do |cmd, opts|
-        cmd_text = ""
-        cmd_text << "%-#{longest_line}s     " % cmd
-        cmd_desc = opts.shift
-        cmd_text << "# #{cmd_desc}" if cmd_desc
-        opts.each do |opt|
-          cmd_text << "\n  %-#{longest_line}s   " % opt.first
-          cmd_text << "# #{opt.last}" if opt.last
-        end
-        cmd_text
-      end.join("\n")
+      help_output = []
+
+      unless cmds.empty?
+        help_output << "Commands\n\n" + cmds.map do |cmd, opts|
+          cmd_text = ""
+          cmd_text << "%-#{longest_line}s     " % cmd
+          cmd_desc = opts.shift
+          cmd_text << "# #{cmd_desc}" if cmd_desc
+          opts.each do |opt|
+            cmd_text << "\n  %-#{longest_line}s   " % opt.first
+            cmd_text << "# #{opt.last}" if opt.last
+          end
+          cmd_text
+        end.join("\n")
+      end
+      if args_lines
+        arg_help = "Arguments\n\n"
+        arg_help << "%-#{longest_line}s     " % args_lines.first
+        arg_help << "# #{args_lines.last}" if args_lines.first
+        help_output << arg_help
+      end
       unless opts_lines.empty?
-        help_output << "\n\nGlobal options\n\n"
-        help_output << opts_lines.map do |opt|
+        help_output << "Global options\n\n" + opts_lines.map do |opt|
           opt_text = ''
           opt_text << "%-#{longest_line}s     " % opt.first
           opt_text << "# #{opt.last}" if opt.last
           opt_text
         end.join("\n")
       end
+      help_output.join("\n\n")
     end
   end
 end

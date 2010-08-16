@@ -143,4 +143,19 @@ describe "Optitron::Parser arg spec" do
       }.should raise_error(Optitron::InvalidParser)
     end
   end
+  
+  context "root level args" do
+    before(:each) {
+      @parser = Optitron.new {
+        arg "file"
+      }
+    }
+
+    it "should parse" do
+      response = @parser.parse(%w(life.rb))
+      response.command.should be_nil
+      response.args.should == ['life.rb']
+      response.valid?.should be_true
+    end
+  end
 end

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "Optitron::Parser help" do
-  it "generate help" do
+  it "generate help for command parsers" do
     @parser = Optitron.new {
       opt 'verbose', "Be very loud"
       cmd "install", "This installs things" do
@@ -21,5 +21,14 @@ describe "Optitron::Parser help" do
       end
     }
     @parser.help.should == "Commands\n\nshow [first] <second>          # This shows things\ninstall [file]                 # This installs things\nkill                           # This kills things\n  -p/--pids=[ARRAY]            # A list of pids to kill\n  -P/--pid=[NUMERIC]           # A pid to kill\n  -n/--names=[HASH]            # Some sort of hash\njoin [thing1 thing2 ...]       # This joins things\n\nGlobal options\n\n-v/--verbose                   # Be very loud"
+  end
+
+  it "generate help for non-command parsers" do
+    @parser = Optitron.new {
+      opt 'verbose', "Be very loud"
+      arg "src", "Source"
+      arg "dest", "Destination"
+    }
+    @parser.help.should == "Arguments\n\n[src] [dest]     # Source, Destination\n\nGlobal options\n\n-v/--verbose     # Be very loud"
   end
 end
