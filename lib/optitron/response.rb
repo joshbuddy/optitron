@@ -8,12 +8,16 @@ class Optitron
       @args_with_tokens = []
       @args = []
       @command = nil
-      @errors = Hash.new{|h,k| h[k] = []}
+      @errors = []
       @params = {}
     end
     
-    def add_error(field, type)
-      @errors[field] << type
+    def add_error(type, field = nil)
+      @errors << [type, field]
+    end
+    
+    def error_messages
+      @errors.map{|(error, field)| field ? "#{field} is #{error}".capitalize : error.capitalize}
     end
     
     def compile_params
@@ -21,7 +25,7 @@ class Optitron
         begin
           params[key.name] = key.validate(value)
         rescue
-          add_error(key.name, 'invalid')
+          add_error('invalid', key.name)
           params[key.name] = value
         end
       end
@@ -33,7 +37,7 @@ class Optitron
         begin
           tok.is_a?(Array) ? tok.map{ |t| arg.validate(t.val) } : arg.validate(tok.val)
         rescue
-          add_error(arg.name, 'invalid')
+          add_error('invalid', arg.name)
           tok.is_a?(Array) ? tok.map{ |t| t.val } : tok.val
         end
       }
@@ -41,12 +45,12 @@ class Optitron
       unless @tokens.empty?
         @tokens.select{|t| t.respond_to?(:name)}.each do |named_token|
           @tokens.delete(named_token)
-          add_error(named_token.name, 'unrecognized')
+          add_error('unrecognized', named_token.name)
         end
         
         if @errors.empty?
           @tokens.each do |token|
-            add_error(token.val, 'unrecognized')
+            add_error('unrecognized', token.val)
           end
         end
       end

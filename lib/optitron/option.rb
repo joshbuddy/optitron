@@ -82,7 +82,7 @@ class Optitron
             elsif default
               default
             else
-              response.add_error(opt.name, "required")
+              response.add_error("required", opt.name)
             end
             response.params_array << [self, value]
           when :array
@@ -95,7 +95,7 @@ class Optitron
           when :hash
             values = []
             if opt_tok.respond_to?(:value)
-              response.add_error(name, "First value isn't in the form key:value") if opt_tok.value[':'].nil?
+              response.add_error("not in the form key:value", name) if opt_tok.value[':'].nil?
               values << opt_tok.value.split(':', 2)
             end
             while tokens[opt_tok_index].respond_to?(:val) and !tokens[opt_tok_index].val[':'].nil?
@@ -143,11 +143,11 @@ class Optitron
             response.args_with_tokens.last.last << arg_tok
           end
           if required? and response.args_with_tokens.last.last.size.zero?
-            response.add_error(self, "required")
+            response.add_error("required", name)
           end
         else
           if arg_tokens.size.zero? and required?
-            response.add_error(self, "required")
+            response.add_error("required", name)
           elsif !arg_tokens.size.zero?
             arg_tok = arg_tokens.shift
             tokens.delete_at(tokens.index(arg_tok))

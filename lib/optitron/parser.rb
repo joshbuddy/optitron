@@ -18,7 +18,7 @@ class Optitron
           options += @commands[cmd_tok.val].options
           args = @commands[cmd_tok.val].args
         else
-          response.add_error(nil, 'unknown command')
+          response.add_error('unknown command')
         end
       end
       parse_options(tokens, options, response)
