@@ -80,15 +80,19 @@ class Optitron
               tokens.delete_at(opt_tok_index).val
             end
             response.params_array << [self, value.nil? ? !default : value]
-          when :numeric
-            value = if opt_tok.name == name and opt_tok.respond_to?(:value)
-              opt_tok.value
+          when :numeric, :string
+            value = if opt_tok.name == name
+              if opt_tok.respond_to?(:value)
+                opt_tok.value
+              else
+                response.add_error("missing", opt_tok.name)
+              end
             elsif tokens[opt_tok_index].respond_to?(:val)
               tokens.delete_at(opt_tok_index).val
             elsif default
               default
             else
-              response.add_error("required", opt.name)
+              response.add_error("required", opt_tok.name)
             end
             response.params_array << [self, value]
           when :array
