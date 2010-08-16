@@ -23,13 +23,13 @@ describe "Optitron::Parser short_name generation" do
 
     it "should parse '-s'" do
       response = @parser.parse(%w(-s))
-      response.params.should == {'something' => true}
+      response.params.should == {'something' => true, 'something-else' => false}
       response.valid?.should be_true
     end
 
     it "should parse '-S'" do
       response = @parser.parse(%w(-S))
-      response.params.should == {'something-else' => true}
+      response.params.should == {'something' => false, 'something-else' => true}
       response.valid?.should be_true
     end
   end

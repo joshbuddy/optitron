@@ -1,7 +1,8 @@
 class Optitron
   class Option
-    attr_accessor :required, :name, :default, :parameterize, :type, :desc
+    attr_accessor :required, :name, :default, :parameterize, :type, :desc, :has_default
     alias_method :required?, :required
+    alias_method :has_default?, :has_default
     alias_method :parameterize?, :parameterize
 
     TRUE_BOOLEAN_VALUES = [true, 't', 'T', 'true', 'TRUE']
@@ -9,6 +10,7 @@ class Optitron
     BOOLEAN_VALUES = TRUE_BOOLEAN_VALUES + FALSE_BOOLEAN_VALUES
 
     def default=(default)
+      @has_default = true unless default.nil?
       interpolate_type(default)
       @default = default
     end
@@ -21,6 +23,10 @@ class Optitron
         :boolean
       when Numeric
         :numeric
+      when Array
+        :array
+      when Hash
+        :hash
       end
     end
 
@@ -40,7 +46,7 @@ class Optitron
         Array(val)
       when :hash
         val.is_a?(Hash) ? val : raise
-      when :greedy, nil
+      when :greedy, nil, :string
         val
       else
         raise
@@ -55,7 +61,7 @@ class Optitron
         end
         @name, @desc = name, desc
         @type = opts && opts[:type] || :boolean
-        self.default = opts && opts.key?(:default) ? opts[:default] : (@type == :boolean ? true : nil)
+        self.default = opts && opts.key?(:default) ? opts[:default] : (@type == :boolean ? false : nil)
       end
 
       def match?(tok)
@@ -73,7 +79,7 @@ class Optitron
             elsif opt_tok.name == name and tokens[opt_tok_index].respond_to?(:val) and BOOLEAN_VALUES.include?(tokens[opt_tok_index].val)
               tokens.delete_at(opt_tok_index).val
             end
-            response.params_array << [self, value.nil? ? default : value]
+            response.params_array << [self, value.nil? ? !default : value]
           when :numeric
             value = if opt_tok.name == name and opt_tok.respond_to?(:value)
               opt_tok.value

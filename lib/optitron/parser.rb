@@ -32,6 +32,7 @@ class Optitron
 
     def parse_options(tokens, options, response)
       options.each do |opt|
+        response.params[opt.name] = opt.default if opt.has_default?
         if opt_tok = tokens.find { |tok| opt.match?(tok) }
           opt_tok_index = tokens.index(opt_tok)
           opt.consume(response, tokens)
