@@ -52,3 +52,14 @@ And <tt>@parser.parse(%w(-v install file))</tt> gives back:
   => ["file"]
   response.params
   => {"verbose" => true}
+
+If you try parsing invalid parameters, get back friendly error messages
+
+  @parser.parse(%w()).error_messages
+  => ["Unknown command"]
+  @parser.parse(%w(something)).error_messages
+  => ["Something is an unknown command"]
+  @parser.parse(%w(install)).error_messages
+  => ["File is required"]
+  @parser.parse(%w(kill --pid=something)).error_messages
+  => ["Pid is invalid"]

@@ -11,14 +11,17 @@ class Optitron
       response = Response.new(tokens)
       options = @options 
       args = nil
-      if !@commands.empty? 
-        if cmd_tok = tokens.find { |t| t.is_a?(Tokenizer::Value) and @commands[t.val] }
+      if !@commands.empty?
+        potential_cmd_toks = tokens.select { |t| t.respond_to?(:val) }
+        if cmd_tok = potential_cmd_toks.find { |t| @commands[t.val] }
           tokens.delete(cmd_tok)
           response.command = cmd_tok.val
           options += @commands[cmd_tok.val].options
           args = @commands[cmd_tok.val].args
         else
-          response.add_error('unknown command')
+          potential_cmd_toks.first ?
+            response.add_error('an unknown command', potential_cmd_toks.first.val) :
+            response.add_error('unknown command')
         end
       end
       parse_options(tokens, options, response)
