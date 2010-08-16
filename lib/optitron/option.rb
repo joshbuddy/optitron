@@ -84,7 +84,7 @@ class Optitron
           when :boolean
             value = if opt_tok.respond_to?(:value)
               opt_tok.value
-            elsif opt_tok.name == name and tokens[opt_tok_index].respond_to?(:val) and BOOLEAN_VALUES.include?(tokens[opt_tok_index].val)
+            elsif opt_tok.name == short_name and tokens[opt_tok_index].respond_to?(:val) and BOOLEAN_VALUES.include?(tokens[opt_tok_index].val)
               tokens.delete_at(opt_tok_index).val
             end
             response.params_array << [self, value.nil? ? !default : value]

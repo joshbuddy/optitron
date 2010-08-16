@@ -134,5 +134,5 @@ Now, try running it.
   crapbook-pro:optitron joshua$ ruby test.rb install file
   installing file with {"verbose"=>false}!
 
-  crapbook-pro:optitron joshua$ ruby test.rb install file --verbose true
+  crapbook-pro:optitron joshua$ ruby test.rb install file --verbose
   installing file with {"verbose"=>true}!

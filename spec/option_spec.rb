@@ -25,6 +25,30 @@ describe "Optitron::Parser options" do
     end
   end
 
+  context "boolean long names vs short names" do
+    before(:each) do
+      @parser = Optitron.new {
+        opt "verbose"
+      }
+    end
+    
+    it "should parse '-v true'" do
+      @parser.parse(%w(-v true)).valid?.should be_true
+    end
+
+    it "shouldn't parse '-v that'" do
+      @parser.parse(%w(-v that)).valid?.should be_false
+    end
+
+    it "shouldn't parse '--verbose true'" do
+      @parser.parse(%w(--verbose true)).valid?.should be_false
+    end
+
+    it "shouldn't parse '--verbose=true'" do
+      @parser.parse(%w(--verbose=true)).valid?.should be_true
+    end
+  end
+
   context "multiple options" do
     before(:each) do
       @parser = Optitron.new {
