@@ -102,4 +102,29 @@ describe "Optitron::Parser types" do
       end
     end
   end
+
+  context "inclusion" do
+    before(:each) {
+      @parser = Optitron.new {
+        opt 'pid', :in => [1, 2, 3, 4]
+        opt 'range', :in => 0...100
+      }
+    }
+
+    it "should parse 'parse --pid=3'" do
+      @parser.parse(%w(--pid=3)).params.should == {'pid' => 3}
+    end
+
+    it "should parse 'parse --range=56'" do
+      @parser.parse(%w(--range=56)).params.should == {'range' => 56}
+    end
+
+    it "shouldn't parse 'parse --range=156'" do
+      @parser.parse(%w(--range=156)).valid?.should be_false
+    end
+
+    it "shouldn't parse 'parse --pid=9'" do
+      @parser.parse(%w(--pid=9)).valid?.should be_false
+    end
+  end
 end

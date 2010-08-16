@@ -14,6 +14,11 @@ class Optitron
       interpolate_type(default)
       @default = default
     end
+
+    def inclusion_test=(tester)
+      interpolate_type(tester.first)
+      @inclusion_test = tester
+    end
     
     def interpolate_type(default)
       @type = case default
@@ -31,7 +36,7 @@ class Optitron
     end
 
     def validate(val)
-      case @type
+      validated_type = case @type
       when :boolean
         if TRUE_BOOLEAN_VALUES.include?(val)
           true
@@ -51,6 +56,8 @@ class Optitron
       else
         raise
       end
+      @inclusion_test.include?(validated_type) or raise if @inclusion_test
+      validated_type
     end
 
     class Opt < Option
@@ -61,6 +68,7 @@ class Optitron
         end
         @name, @desc = name, desc
         @type = opts && opts[:type] || :boolean
+        self.inclusion_test = opts[:in] if opts && opts[:in]
         self.default = opts && opts.key?(:default) ? opts[:default] : (@type == :boolean ? false : nil)
       end
 
@@ -132,13 +140,14 @@ class Optitron
     end
     
     class Arg < Option
-      attr_accessor :greedy
+      attr_accessor :greedy, :inclusion_test
       alias_method :greedy?, :greedy
       def initialize(name = nil, desc = nil, opts = nil)
         if desc.is_a?(Hash)
           desc, opts = nil, desc
         end
         @name, @desc = name, desc
+        self.inclusion_test = opts[:in] if opts && opts[:in]
         @required = opts && opts.key?(:required) ? opts[:required] : true
         @type = opts && opts[:type]
       end
