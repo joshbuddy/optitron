@@ -1,0 +1,54 @@
+= Optitron
+
+== Sensible options parsing
+
+You can specify lots of different commands with options
+
+  @parser = Optitron.new {
+    opt 'verbose', "Be very loud"
+    cmd "install", "This installs things" do
+      arg "file", "The file to install"
+    end
+    cmd "show", "This shows things" do
+      arg "first", "The first thing to show"
+      arg "second", "The second optional thing to show", :required => false
+    end
+    cmd "kill", "This kills things" do
+      opt "pids", "A list of pids to kill", :type => :array
+      opt "pid", "A pid to kill", :type => :numeric
+      opt "names", "Some sort of hash", :type => :hash
+    end
+    cmd "join", "This joins things" do
+      arg "thing", "Stuff to join", :type => :greedy
+    end
+  }
+
+Want to see the help?
+
+  @parser.help
+
+Will output:
+
+  Commands
+  
+  show [first] <second>          # This shows things
+  install [file]                 # This installs things
+  kill                           # This kills things
+    -p/--pids=[ARRAY]            # A list of pids to kill
+    -P/--pid=[NUMERIC]           # A pid to kill
+    -n/--names=[HASH]            # Some sort of hash
+  join [thing1 thing2 ...]       # This joins things
+  
+  Global options
+  
+  -v/--verbose                   # Be very loud
+
+And <tt>@parser.parse(%w(-v install file))</tt> gives back:
+
+  response = @parser.parse(%w(-v install file))
+  response.command
+  => "install"
+  response.args
+  => ["file"]
+  response.params
+  => {"verbose" => true}

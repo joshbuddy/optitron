@@ -1,0 +1,43 @@
+ordered params
+named params
+default values
+
+Optitron::Parse
+
+parser = Optitron::Parser.new
+parser.literal('test')
+parser.required(:test).integer.parse_with { 
+  ordered(:test2)
+  ordered(:test3).optional.default('value')
+  named(:something)
+}
+
+parser.required(:test2).type(:integer).parse_with
+
+Optitron.transform {
+    opt 'no-color', "Uncolored output", :short => 'c'
+    opt 'quiet', "Don't output anything"
+    cmd "install" {
+        desc "This is the group to install from"
+        arg "group", :requied => false
+        opt "noop"
+    }
+    cmd "list" {
+        arg "group", :requied => false
+        opt "format", 'human', :valid => ['human', 'xml', 'json'] <--- and this???
+        opt "depth", nil, :type => :number (allow nil is implied)
+    }
+}
+
+=> {:cmd => 'install', :args => {'group' => 'development}, :options => {'quiet' => true}}
+
+Optitron.new {
+     ...
+     ..
+}.parse( ... ) 
+
+same as
+
+Optitron.transform ?
+
+
