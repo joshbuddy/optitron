@@ -35,10 +35,10 @@ class Optitron
       compile_params
       @args = @args_with_tokens.map { |(arg, tok)| 
         begin
-          tok.is_a?(Array) ? tok.map{ |t| arg.validate(t.val) } : arg.validate(tok.val)
+          tok.is_a?(Array) ? tok.map{ |t| arg.validate(t.lit) } : arg.validate(tok.lit)
         rescue
           add_error('invalid', arg.name)
-          tok.is_a?(Array) ? tok.map{ |t| t.val } : tok.val
+          tok.is_a?(Array) ? tok.map{ |t| t.lit } : tok.lit
         end
       }
       @args.flatten!
@@ -50,7 +50,7 @@ class Optitron
         
         if @errors.empty?
           @tokens.each do |token|
-            add_error('unrecognized', token.val)
+            add_error('unrecognized', token.lit)
           end
         end
       end

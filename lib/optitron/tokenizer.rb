@@ -6,7 +6,7 @@ class Optitron
       tokenize
     end
 
-    Value = Struct.new(:val)
+    Value = Struct.new(:lit)
     Named = Struct.new(:name)
     NamedWithValue = Struct.new(:name, :value)
 
@@ -15,9 +15,9 @@ class Optitron
         @tokens = @opts.map {|t|
           case t
           when /^--([^=]+)=([^=]+)$/ then NamedWithValue.new($1, $2)
-          when /^--([^=]+)$/         then Named.new($1)
+          when /^--([^=]+)$/         then NamedWithValue.new($1, nil)
           when /^-(.*)/              then $1.split('').map{|letter| Named.new(letter)}
-          else                          Value.new(t)
+          else                            Value.new(t)
           end
         }
         @tokens.flatten!

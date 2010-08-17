@@ -76,16 +76,24 @@ class Optitron
         tok.respond_to?(:name) and [name, short_name].include?(tok.name)
       end
 
+      def find_matching_token(tokens)
+        tokens.find do |t|
+          if t.respond_to?(:name) and (t.name == name or t.name == short_name)
+            t.respond_to?(:value) ^ (t.name == short_name)
+          end
+        end
+      end
+
       def consume(response, tokens)
-        if opt_tok = tokens.find{|t| t.respond_to?(:name) and (t.name == short_name or t.name == name)}
+        if opt_tok = find_matching_token(tokens)
           opt_tok_index = tokens.index(opt_tok)
           tokens.delete_at(opt_tok_index)
           case @type
           when :boolean
             value = if opt_tok.respond_to?(:value)
               opt_tok.value
-            elsif opt_tok.name == short_name and tokens[opt_tok_index].respond_to?(:val) and BOOLEAN_VALUES.include?(tokens[opt_tok_index].val)
-              tokens.delete_at(opt_tok_index).val
+            elsif opt_tok.name == short_name and tokens[opt_tok_index].respond_to?(:lit) and BOOLEAN_VALUES.include?(tokens[opt_tok_index].lit)
+              tokens.delete_at(opt_tok_index).lit
             end
             response.params_array << [self, value.nil? ? !default : value]
           when :numeric, :string
@@ -95,8 +103,8 @@ class Optitron
               else
                 response.add_error("missing", opt_tok.name)
               end
-            elsif tokens[opt_tok_index].respond_to?(:val)
-              tokens.delete_at(opt_tok_index).val
+            elsif tokens[opt_tok_index].respond_to?(:lit)
+              tokens.delete_at(opt_tok_index).lit
             elsif default
               default
             else
@@ -106,8 +114,8 @@ class Optitron
           when :array
             values = []
             values << opt_tok.value if opt_tok.respond_to?(:value)
-            while tokens[opt_tok_index].respond_to?(:val)
-              values << tokens.delete_at(opt_tok_index).val
+            while tokens[opt_tok_index].respond_to?(:lit)
+              values << tokens.delete_at(opt_tok_index).lit
             end
             response.params_array << [self, values]
           when :hash
@@ -116,8 +124,8 @@ class Optitron
               response.add_error("not in the form key:value", name) if opt_tok.value[':'].nil?
               values << opt_tok.value.split(':', 2)
             end
-            while tokens[opt_tok_index].respond_to?(:val) and !tokens[opt_tok_index].val[':'].nil?
-              values << tokens.delete_at(opt_tok_index).val.split(':', 2)
+            while tokens[opt_tok_index].respond_to?(:lit) and !tokens[opt_tok_index].lit[':'].nil?
+              values << tokens.delete_at(opt_tok_index).lit.split(':', 2)
             end
             response.params_array << [self, Hash[values]]
           else
@@ -153,7 +161,7 @@ class Optitron
       end
       
       def consume(response, tokens)
-        arg_tokens = tokens.select{ |tok| tok.respond_to?(:val) }
+        arg_tokens = tokens.select{ |tok| tok.respond_to?(:lit) }
         if type == :greedy
           response.args_with_tokens << [self, []]
           while !arg_tokens.size.zero?

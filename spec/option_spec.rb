@@ -44,6 +44,10 @@ describe "Optitron::Parser options" do
       @parser.parse(%w(--verbose true)).valid?.should be_false
     end
 
+    it "shouldn't parse '--v'" do
+      @parser.parse(%w(--v)).valid?.should be_false
+    end
+
     it "shouldn't parse '--verbose=true'" do
       @parser.parse(%w(--verbose=true)).valid?.should be_true
     end
