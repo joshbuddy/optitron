@@ -79,8 +79,8 @@ describe "Optitron::Parser options" do
       }
     end
     
-    it "should parse '-otest'" do
-      @parser.parse(%w(-otest)).params.should == {'option' => 'test', '1' => false, '2' => false, '3' => false}
+    it "should parse '-123otest'" do
+      @parser.parse(%w(-123otest)).params.should == {'option' => 'test', '1' => true, '2' => true, '3' => true}
     end
 
     it "should parse '-123o test'" do
