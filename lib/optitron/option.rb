@@ -35,6 +35,34 @@ class Optitron
       end
     end
 
+    def boolean?
+      @type == :boolean
+    end
+
+    def numeric?
+      @type == :numeric
+    end
+
+    def array?
+      @type == :array
+    end
+
+    def string?
+      @type == :string
+    end
+
+    def hash?
+      @type == :hash
+    end
+
+    def greedy?
+      @type == :greedy
+    end
+
+    def any?
+      @type.nil?
+    end
+
     def validate(val)
       validated_type = case @type
       when :boolean

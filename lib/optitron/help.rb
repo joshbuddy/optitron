@@ -7,7 +7,7 @@ class Optitron
     def help_line_for_opt(opt)
       opt_line = ''
       opt_line << [opt.short_name ? "-#{opt.short_name}" : nil, "--#{opt.name}"].compact.join('/')
-      opt_line << "=[#{opt.type.to_s.upcase}]" if opt.type != :boolean
+      opt_line << "=[#{opt.type.to_s.upcase}]" unless opt.boolean?
       [opt_line, opt.desc]
     end
 

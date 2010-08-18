@@ -16,8 +16,8 @@ class Optitron
           case t
           when /^--([^-][^=]+)=([^=]+)$/ then NamedWithValue.new($1, $2)
           when /^--([^-][^=]+)$/         then NamedWithValue.new($1, nil)
-          when /^-(.*)/              then find_names_values($1)
-          else                            Value.new(t)
+          when /^-(.*)/                  then find_names_values($1)
+          else                                Value.new(t)
           end
         }
         @tokens.flatten!
@@ -30,7 +30,7 @@ class Optitron
       while !letters.empty?
         let = letters.shift
         toks << Named.new(let)
-        if @parser.short_opts[let] && @parser.short_opts[let].type != :boolean && !letters.empty?
+        if @parser.short_opts[let] && !@parser.short_opts[let].boolean? && !letters.empty?
           toks << Value.new(letters.join)
           letters.clear
         end
