@@ -1,11 +1,13 @@
 class Optitron
   class Parser
     attr_accessor :target
-    attr_reader :commands, :options, :args
+    attr_reader :commands, :options, :args, :short_opts
+    
     def initialize
       @options = []
       @commands = {}
       @args = []
+      @short_opts = {}
       @help = Help.new(self)
     end
 
@@ -14,7 +16,7 @@ class Optitron
     end
 
     def parse(args = ARGV)
-      tokens = Tokenizer.new(args).tokens
+      tokens = Tokenizer.new(self, args).tokens
       response = Response.new(self, tokens)
       options = @options 
       args = @args

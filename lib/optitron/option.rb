@@ -68,6 +68,7 @@ class Optitron
         end
         @name, @desc = name, desc
         @type = opts && opts[:type] || :boolean
+        self.short_name = opts[:short_name] if opts && opts[:short_name]
         self.inclusion_test = opts[:in] if opts && opts[:in]
         self.default = opts && opts.key?(:default) ? opts[:default] : (@type == :boolean ? false : nil)
       end

@@ -53,6 +53,22 @@ describe "Optitron::Parser options" do
     end
   end
 
+  context "auto assingment of short names" do
+    before(:each) do
+      @parser = Optitron.new {
+        opt "verbose", :short_name => 'v'
+        opt "vicious", :type => :string
+        opt "vendetta", :short_name => 'V'
+      }
+    end
+    
+    it "should parse '-Vv --vicious=what'" do
+      response = @parser.parse(%w(-Vv --vicious=what))
+      response.valid?.should be_true
+      response.params
+    end
+  end
+
   context "multiple options" do
     before(:each) do
       @parser = Optitron.new {
@@ -63,6 +79,10 @@ describe "Optitron::Parser options" do
       }
     end
     
+    it "should parse '-otest'" do
+      @parser.parse(%w(-otest)).params.should == {'option' => 'test', '1' => false, '2' => false, '3' => false}
+    end
+
     it "should parse '-123o test'" do
       @parser.parse(%w(-123o test)).params.should == {'option' => 'test', '1' => true, '2' => true, '3' => true}
     end

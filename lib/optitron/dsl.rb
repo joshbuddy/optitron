@@ -2,7 +2,18 @@ class Optitron
   class Dsl
 
     def initialize(parser, &blk)
-      RootParserDsl.new(parser).configure_with(blk)
+      root = RootParserDsl.new(parser)
+      root.configure_with(blk)
+      root.unclaimed_opts.each do |opt_option|
+        name = opt_option.name
+        if !root.short_opts.key?(name[0].chr)
+          opt_option.short_name = name[0].chr
+          root.short_opts[name[0].chr] = opt_option
+        elsif !root.short_opts.key?(name.upcase[0].chr)
+          opt_option.short_name = name.upcase[0].chr
+          root.short_opts[name.upcase[0].chr] = opt_option
+        end
+      end
     end
 
     class AbstractDsl
@@ -12,13 +23,12 @@ class Optitron
       
       def opt(name, description = nil, opts = nil)
         opt_option = Option::Opt.new(name, description, opts)
-        if !short_opts.include?(name[0])
-          opt_option.short_name = name[0].chr
-          short_opts << name[0]
-        elsif !short_opts.include?(name.upcase[0])
-          opt_option.short_name = name.upcase[0].chr
-          short_opts << name.upcase[0]
+        if opt_option.short_name
+          short_opts[opt_option.short_name] = opt_option
+        else
+          unclaimed_opts << opt_option
         end
+        
         @target.options << opt_option
       end
       
@@ -33,6 +43,10 @@ class Optitron
       def short_opts
         @root_dsl.short_opts
       end
+      
+      def unclaimed_opts
+        @root_dsl.unclaimed_opts
+      end
     end
 
     class CmdParserDsl < AbstractDsl
@@ -43,12 +57,16 @@ class Optitron
     end
     
     class RootParserDsl < AbstractDsl
-      attr_reader :short_opts
+      attr_reader :unclaimed_opts
       def initialize(parser)
-        @short_opts = []
         @target = parser
+        @unclaimed_opts = []
       end
-      
+
+      def short_opts
+        @target.short_opts
+      end
+
       def cmd(name, description = nil, opts = nil, &blk)
         command_option = Option::Cmd.new(name, description, opts)
         CmdParserDsl.new(self, command_option).configure_with(blk) if blk
