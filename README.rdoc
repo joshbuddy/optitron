@@ -5,6 +5,7 @@
 You can specify lots of different commands with options
 
   @parser = Optitron.new {
+    help
     opt 'verbose', "Be very loud"
     cmd "install", "This installs things" do
       arg "file", "The file to install"
@@ -96,39 +97,9 @@ To use this in a file, create a parser, and tell it to dispatch to your favourit
 Now, try running it.
 
   crapbook-pro:optitron joshua$ ruby test.rb 
-  Commands
-  
-  show [first] <second>          # This shows things
-  install [file]                 # This installs things
-  kill                           # This kills things
-    -p/--pids=[ARRAY]            # A list of pids to kill
-    -P/--pid=[NUMERIC]           # A pid to kill
-    -n/--names=[HASH]            # Some sort of hash
-  join [thing1 thing2 ...]       # This joins things
-  
-  Global options
-  
-  -v/--verbose                   # Be very loud
-  
-  Errors:
   Unknown command
   
   crapbook-pro:optitron joshua$ ruby test.rb install
-  Commands
-  
-  show [first] <second>          # This shows things
-  install [file]                 # This installs things
-  kill                           # This kills things
-    -p/--pids=[ARRAY]            # A list of pids to kill
-    -P/--pid=[NUMERIC]           # A pid to kill
-    -n/--names=[HASH]            # Some sort of hash
-  join [thing1 thing2 ...]       # This joins things
-  
-  Global options
-  
-  -v/--verbose                   # Be very loud
-  
-  Errors:
   File is required
   
   crapbook-pro:optitron joshua$ ruby test.rb install file

@@ -33,6 +33,7 @@ class Optitron
     
     def validate
       compile_params
+      @params_array.each { |(key, value)| key.run.call(params[key.name], self) if key.run }
       @args = @args_with_tokens.map { |(arg, tok)| 
         begin
           tok.is_a?(Array) ? tok.map{ |t| arg.validate(t.lit) } : arg.validate(tok.lit)
@@ -62,8 +63,6 @@ class Optitron
         dispatch_args = params.empty? ? args : args + [params]
         @parser.target.send(command.to_sym, *dispatch_args)
       else
-        puts @parser.help
-        puts "\nErrors:"
         puts error_messages.join("\n")
       end
     end

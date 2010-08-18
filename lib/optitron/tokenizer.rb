@@ -14,8 +14,8 @@ class Optitron
       unless @tokens
         @tokens = @opts.map {|t|
           case t
-          when /^--([^=]+)=([^=]+)$/ then NamedWithValue.new($1, $2)
-          when /^--([^=]+)$/         then NamedWithValue.new($1, nil)
+          when /^--([^-][^=]+)=([^=]+)$/ then NamedWithValue.new($1, $2)
+          when /^--([^-][^=]+)$/         then NamedWithValue.new($1, nil)
           when /^-(.*)/              then find_names_values($1)
           else                            Value.new(t)
           end

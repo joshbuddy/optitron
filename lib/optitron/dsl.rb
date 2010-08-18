@@ -3,7 +3,7 @@ class Optitron
 
     def initialize(parser, &blk)
       root = RootParserDsl.new(parser)
-      root.configure_with(blk)
+      root.configure_with(&blk)
       root.unclaimed_opts.each do |opt_option|
         name = opt_option.name
         if !root.short_opts.key?(name[0].chr)
@@ -17,7 +17,7 @@ class Optitron
     end
 
     class AbstractDsl
-      def configure_with(block)
+      def configure_with(&block)
         instance_eval(&block)
       end
       
@@ -63,13 +63,24 @@ class Optitron
         @unclaimed_opts = []
       end
 
+      def help(desc = "Print help message")
+        configure_with {
+          opt 'help', desc, :short_name => '?', :run => proc{ |value, response|
+            if value
+              puts @target.help
+              exit(0)
+            end
+          }
+        }
+      end
+
       def short_opts
         @target.short_opts
       end
 
       def cmd(name, description = nil, opts = nil, &blk)
         command_option = Option::Cmd.new(name, description, opts)
-        CmdParserDsl.new(self, command_option).configure_with(blk) if blk
+        CmdParserDsl.new(self, command_option).configure_with(&blk) if blk
         @target.commands[name] = command_option
       end
     end

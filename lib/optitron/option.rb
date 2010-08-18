@@ -61,7 +61,7 @@ class Optitron
     end
 
     class Opt < Option
-      attr_accessor :short_name
+      attr_accessor :short_name, :run
       def initialize(name, desc = nil, opts = nil)
         if desc.is_a?(Hash)
           desc, opts = nil, desc
@@ -69,6 +69,7 @@ class Optitron
         @name, @desc = name, desc
         @type = opts && opts[:type] || :boolean
         self.short_name = opts[:short_name] if opts && opts[:short_name]
+        self.run = opts[:run] if opts && opts[:run]
         self.inclusion_test = opts[:in] if opts && opts[:in]
         self.default = opts && opts.key?(:default) ? opts[:default] : (@type == :boolean ? false : nil)
       end
@@ -137,12 +138,13 @@ class Optitron
     end
     
     class Cmd < Option
-      attr_reader :options, :args
+      attr_reader :options, :args, :run
       def initialize(name, desc = nil, opts = nil)
         if desc.is_a?(Hash)
           desc, opts = nil, desc
         end
         @name, @desc = name, desc
+        @run = opts[:run] if opts && opts[:run]
         @options = []
         @args = []
       end
