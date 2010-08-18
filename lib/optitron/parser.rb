@@ -20,7 +20,7 @@ class Optitron
       response = Response.new(self, tokens)
       options = @options 
       args = @args
-      if !@commands.empty?
+      unless @commands.empty?
         potential_cmd_toks = tokens.select { |t| t.respond_to?(:lit) }
         if cmd_tok = potential_cmd_toks.find { |t| @commands[t.lit] }
           tokens.delete(cmd_tok)

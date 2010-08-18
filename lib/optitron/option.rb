@@ -187,7 +187,8 @@ class Optitron
         end
         @name, @desc = name, desc
         self.inclusion_test = opts[:in] if opts && opts[:in]
-        @required = opts && opts.key?(:required) ? opts[:required] : true
+        @default = opts && opts[:default]
+        @required = opts && opts.key?(:required) ? opts[:required] : @default.nil?
         @type = opts && opts[:type]
       end
       

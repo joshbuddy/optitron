@@ -107,3 +107,49 @@ Now, try running it.
 
   crapbook-pro:optitron joshua$ ruby test.rb install file --verbose
   installing file with {"verbose"=>true}!
+
+== Usage in a class
+
+  require 'optitron'
+  
+  class Runner
+    include Optitron::ClassDsl
+  
+    class_opt 'verbose'
+    use_help
+  
+    desc "Install stuff"
+    opt 'force'
+    arg 'file'
+    arg 'source', :required => false
+    def install(file, source)
+      puts "install some things #{file} from #{source.inspect} #{params.inspect}"
+    end
+  end
+  
+  Runner.dispatch
+  
+Running this gives you
+
+  crapbook-pro:optitron joshua$ ruby ideal.rb --help
+  Commands
+  
+  install [file] <source>       # Install stuff
+    -f/--force                  
+  
+  Global options
+  
+  -v/--verbose                  
+  -?/--help                     # Print help message
+
+  crapbook-pro:optitron joshua$ ruby ideal.rb install
+  File is required
+
+  crapbook-pro:optitron joshua$ ruby ideal.rb install file
+  installing file from yourmom with params: {"help"=>false, "force"=>false, "verbose"=>false}
+
+  crapbook-pro:optitron joshua$ ruby ideal.rb install file yourdad
+  installing file from yourdad with params: {"help"=>false, "force"=>false, "verbose"=>false}
+
+  crapbook-pro:optitron joshua$ ruby ideal.rb install file yourdad -v
+  installing file from yourdad with params: {"help"=>false, "force"=>false, "verbose"=>true}

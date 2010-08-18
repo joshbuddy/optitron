@@ -1,5 +1,6 @@
 class Optitron
   autoload :Dsl,       'optitron/dsl'
+  autoload :ClassDsl,  'optitron/class_dsl'
   autoload :Tokenizer, 'optitron/tokenizer'
   autoload :Parser,    'optitron/parser'
   autoload :Response,  'optitron/response'

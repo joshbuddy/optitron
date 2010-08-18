@@ -1,21 +1,28 @@
 class Optitron
   class Dsl
+    attr_reader :root
 
     def initialize(parser, &blk)
-      root = RootParserDsl.new(parser)
-      root.configure_with(&blk)
-      root.unclaimed_opts.each do |opt_option|
-        name = opt_option.name
-        if !root.short_opts.key?(name[0].chr)
-          opt_option.short_name = name[0].chr
-          root.short_opts[name[0].chr] = opt_option
-        elsif !root.short_opts.key?(name.upcase[0].chr)
-          opt_option.short_name = name.upcase[0].chr
-          root.short_opts[name.upcase[0].chr] = opt_option
-        end
+      @root = RootParserDsl.new(parser)
+      if blk
+        @root.configure_with(&blk)
+        configure_options
       end
     end
 
+    def configure_options
+      @root.unclaimed_opts.each do |opt_option|
+        name = opt_option.name
+        if !@root.short_opts.key?(name[0].chr)
+          opt_option.short_name = name[0].chr
+          @root.short_opts[name[0].chr] = opt_option
+        elsif !@root.short_opts.key?(name.upcase[0].chr)
+          opt_option.short_name = name.upcase[0].chr
+          @root.short_opts[name.upcase[0].chr] = opt_option
+        end
+      end
+    end
+    
     class AbstractDsl
       def configure_with(&block)
         instance_eval(&block)
