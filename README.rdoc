@@ -112,16 +112,13 @@ Now, try running it.
 
   require 'optitron'
   
-  class Runner
-    include Optitron::ClassDsl
+  class Runner < Optitron::CLI
   
     class_opt 'verbose'
     use_help
   
     desc "Install stuff"
     opt 'force'
-    arg 'file'
-    arg 'source', :required => false
     def install(file, source)
       puts "install some things #{file} from #{source.inspect} #{params.inspect}"
     end
