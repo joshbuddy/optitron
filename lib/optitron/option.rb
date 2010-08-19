@@ -89,7 +89,7 @@ class Optitron
     end
 
     class Opt < Option
-      attr_accessor :short_name, :run
+      attr_accessor :short_name, :run, :parent_cmd
       def initialize(name, desc = nil, opts = nil)
         if desc.is_a?(Hash)
           desc, opts = nil, desc
@@ -179,7 +179,7 @@ class Optitron
     end
     
     class Arg < Option
-      attr_accessor :greedy, :inclusion_test
+      attr_accessor :greedy, :inclusion_test, :parent_cmd
       alias_method :greedy?, :greedy
       def initialize(name = nil, desc = nil, opts = nil)
         if desc.is_a?(Hash)

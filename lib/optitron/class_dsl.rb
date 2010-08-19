@@ -60,10 +60,7 @@ class Optitron
   module ClassDsl
     
     def self.included(o)
-      o.module_eval "
-      @@optitron_parser = Optitron::Parser.new
-      @@optitron_dsl = Optitron::Dsl.new(@@optitron_parser)
-      @@method_args = nil
+      o.class_eval "
       attr_accessor :params
       class << self;
         include ClassMethods
@@ -81,36 +78,36 @@ class Optitron
           @args.clear if @args
         end
       end
-
+      def optitron_parser
+        send(:class_variable_set, :@@optitron_parser, Optitron::Parser.new) unless send(:class_variable_defined?, :@@optitron_parser)
+        send(:class_variable_get, :@@optitron_parser)
+      end
+      
       def optitron_dsl
-        self.send(:class_variable_get, :@@optitron_dsl)
+        send(:class_variable_set, :@@optitron_dsl, Optitron::Dsl.new(optitron_parser)) unless send(:class_variable_defined?, :@@optitron_dsl)
+        send(:class_variable_get, :@@optitron_dsl)
       end
       
       def method_args
-        self.send(:class_variable_get, :@@method_args)
+        send(:class_variable_get, :@@method_args)
       end
 
       def build_method_args(file)
-        method_args = self.send(:class_variable_get, :@@method_args)
-        unless method_args
+        unless self.send(:class_variable_defined?, :@@method_args)
           parser = RubyParser.new
           sexp = parser.process(File.read(file))
           method_args = MethodArgs.new(self)
           method_args.process(sexp)
           self.send(:class_variable_set, :@@method_args, method_args.method_map)
         end
-        method_args
-      end
-      
-      def optitron_parser
-        self.send(:class_variable_get, :@@optitron_parser)
+        send(:class_variable_get, :@@method_args)
       end
       
       def class_opt(name, desc = nil, opts = nil)
         optitron_dsl.root.opt(name, desc, opts)
       end
 
-      def use_help
+      def dont_use_help
         optitron_dsl.root.help
       end
 
@@ -126,6 +123,7 @@ class Optitron
 
       def build
         unless @built
+          optitron_dsl.root.help
           @cmds.each do |(cmd_name, cmd_desc, opts)|
             args = method_args[cmd_name.to_sym]
             arity = instance_method(cmd_name).arity
@@ -148,9 +146,9 @@ class Optitron
         end
       end
 
-      def dispatch(args = ARGV)
+      def dispatch(args = ARGV, &blk)
         build
-        optitron_parser.target = new
+        optitron_parser.target = blk ? blk.call : new
         response = optitron_parser.parse(args)
         if response.valid?
           optitron_parser.target.params = response.params

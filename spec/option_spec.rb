@@ -65,7 +65,32 @@ describe "Optitron::Parser options" do
     it "should parse '-Vv --vicious=what'" do
       response = @parser.parse(%w(-Vv --vicious=what))
       response.valid?.should be_true
-      response.params
+      response.params.should == {"vicious"=>"what", "vendetta"=>true, "verbose"=>true}
+    end
+  end
+
+  context "auto assingment of short names in cmd parsers" do
+    before(:each) do
+      @parser = Optitron.new {
+        cmd "one" do
+          opt "verbose"
+        end
+        cmd "two" do
+          opt "verbose"
+        end
+      }
+    end
+    
+    it "should parse 'one -v'" do
+      response = @parser.parse(%w(one -v))
+      response.valid?.should be_true
+      response.params.should == {'verbose' => true}
+    end
+
+    it "should parse 'two -V'" do
+      response = @parser.parse(%w(two -V))
+      response.valid?.should be_true
+      response.params.should == {'verbose' => true}
     end
   end
 

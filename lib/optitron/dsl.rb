@@ -35,8 +35,8 @@ class Optitron
         else
           unclaimed_opts << opt_option
         end
-        
         @target.options << opt_option
+        opt_option
       end
       
       def arg(name, description = nil, opts = nil)
@@ -60,6 +60,18 @@ class Optitron
       def initialize(root_dsl, command)
         @root_dsl = root_dsl
         @target = command
+      end
+      
+      def opt(name, description = nil, opts = nil)
+        o = super
+        o.parent_cmd = @target
+        o
+      end
+
+      def arg(name, description = nil, opts = nil)
+        a = super
+        a.parent_cmd = @target
+        a
       end
     end
     
