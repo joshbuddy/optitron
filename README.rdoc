@@ -115,7 +115,6 @@ Now, try running it.
   class Runner < Optitron::CLI
   
     class_opt 'verbose'
-    use_help
   
     desc "Install stuff"
     opt 'force'
@@ -130,14 +129,14 @@ Running this gives you
 
   crapbook-pro:optitron joshua$ ruby ideal.rb --help
   Commands
-  
-  install [file] <source>       # Install stuff
-    -f/--force                  
-  
+
+  install [file] <required="yourmom">       # Install stuff
+    -f/--force                              
+
   Global options
-  
-  -v/--verbose                  
-  -?/--help                     # Print help message
+
+  -v/--verbose                              
+  -?/--help                                 # Print help message
 
   crapbook-pro:optitron joshua$ ruby ideal.rb install
   File is required
