@@ -64,11 +64,13 @@ class Optitron
 
     module ClassMethods
       def method_added(m)
-        last_opts = @opts
-        @cmds ||= []
-        @cmds << [m.to_s, @last_desc, @opts.dup || []]
-        @opts.clear if @opts
-        @args.clear if @args
+        if @last_desc
+          last_opts = @opts
+          @cmds ||= []
+          @cmds << [m.to_s, @last_desc, @opts ? @opts.dup : []]
+          @opts.clear if @opts
+          @args.clear if @args
+        end
       end
 
       def optitron_dsl
@@ -134,10 +136,10 @@ class Optitron
         optitron_dsl.configure_options
       end
 
-      def dispatch
+      def dispatch(args = ARGV)
         build
         optitron_parser.target = new
-        response = optitron_parser.parse(ARGV)
+        response = optitron_parser.parse(args)
         if response.valid?
           optitron_parser.target.params = response.params
           args = response.args

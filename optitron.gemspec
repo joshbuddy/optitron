@@ -20,6 +20,8 @@ Gem::Specification.new do |s|
   s.add_dependency "ruby2ruby", "= 1.2.4"
   s.add_dependency "sexp_processor", "= 3.0.4"
   s.add_development_dependency "bundler", ">= 1.0.0.rc.3"
+  s.add_development_dependency "rake"
+  s.add_development_dependency "rspec"
 
   s.files        = `git ls-files`.split("\n")
   s.require_path = 'lib'
