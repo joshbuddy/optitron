@@ -19,6 +19,9 @@ class Optitron
       else
         arg_line << arg.name
       end
+      if arg.default
+        arg_line << "=#{arg.default.inspect}"
+      end
       arg_line << (arg.required? ? ']' : '>')
       arg_line
     end
