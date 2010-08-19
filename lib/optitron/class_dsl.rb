@@ -7,9 +7,18 @@ class Optitron
   
   class MethodArgs < SexpProcessor
     attr_reader :method_map
-    def initialize
+    def initialize(cls)
+      @cls = cls
       @method_map = {}
-      super
+      super()
+    end
+
+    def process_class(exp)
+      exp.shift
+      @current_class = exp.first.to_sym
+      process(exp)
+      exp.clear
+      exp
     end
 
     def process_defn(exp)
@@ -44,7 +53,7 @@ class Optitron
           end
         end
       end
-      @method_map[@current_method] = arg_list
+      @method_map[@current_method] = arg_list if @cls.name.to_sym == @current_class
     end
   end
   
@@ -86,7 +95,7 @@ class Optitron
         unless method_args
           parser = RubyParser.new
           sexp = parser.process(File.read(file))
-          method_args = MethodArgs.new
+          method_args = MethodArgs.new(self)
           method_args.process(sexp)
           self.send(:class_variable_set, :@@method_args, method_args.method_map)
         end
@@ -116,24 +125,27 @@ class Optitron
       end
 
       def build
-        @cmds.each do |(cmd_name, cmd_desc, opts)|
-          args = method_args[cmd_name.to_sym]
-          arity = instance_method(cmd_name).arity
-          optitron_dsl.root.cmd(cmd_name, cmd_desc) do
-            opts.each { |o| opt *o }
-            args.each do |(arg_name, arg_type, arg_default)|
-              case arg_type
-              when :required
-                arg arg_name.to_s, :default => arg_default && eval(arg_default)
-              when :optional
-                arg arg_name.to_s, :default => arg_default && eval(arg_default), :required => false
-              when :greedy
-                arg arg_name.to_s, :default => arg_default && eval(arg_default), :type => :greedy
+        unless @built
+          @cmds.each do |(cmd_name, cmd_desc, opts)|
+            args = method_args[cmd_name.to_sym]
+            arity = instance_method(cmd_name).arity
+            optitron_dsl.root.cmd(cmd_name, cmd_desc) do
+              opts.each { |o| opt *o }
+              args.each do |(arg_name, arg_type, arg_default)|
+                case arg_type
+                when :required
+                  arg arg_name.to_s, :default => arg_default && eval(arg_default)
+                when :optional
+                  arg arg_name.to_s, :default => arg_default && eval(arg_default), :required => false
+                when :greedy
+                  arg arg_name.to_s, :default => arg_default && eval(arg_default), :type => :greedy
+                end
               end
             end
           end
+          optitron_dsl.configure_options
+          @built = true
         end
-        optitron_dsl.configure_options
       end
 
       def dispatch(args = ARGV)

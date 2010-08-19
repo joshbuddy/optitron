@@ -8,18 +8,18 @@ class CLIExample < Optitron::CLI
   end
 
   desc "Use this"
-  class_opt 'use_opt'
+  opt 'use_opt'
   def use
     puts "using this"
   end
 
   desc "Use this too"
-  class_opt 'another_opt'
+  opt 'another_opt'
   def use_too(one, two = 'three')
   end
 
   desc "Use this three"
-  class_opt 'another_opt_as_well', :default => 123
+  opt 'another_opt_as_well', :default => 123
   def use_greedy(one, *two)
   end
 end
@@ -27,7 +27,8 @@ end
 
 describe "Optitron::Parser defaults" do
   it "should generate the correct help" do
-    CLIExample.optitron_parser.help.strip.should == "Global options\n\n--verbose                           \n-?/--help                           # Print help message\n--use_opt                           \n--another_opt                       \n--another_opt_as_well=[NUMERIC]"
+    CLIExample.build
+    CLIExample.optitron_parser.help.strip.should == "Commands\n\nuse_greedy [one] [two1 two2 ...]       # Use this three\n  -A/--another_opt_as_well=[NUMERIC]   \nuse_too [one] <required=\"three\">       # Use this too\n  -a/--another_opt                     \nuse                                    # Use this\n  -u/--use_opt                         \n\nGlobal options\n\n-v/--verbose                           \n-?/--help                              # Print help message"
   end
 
   it "should dispatch" do
