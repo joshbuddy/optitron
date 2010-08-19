@@ -6,6 +6,7 @@ class Optitron
   autoload :Response,  'optitron/response'
   autoload :Option,    'optitron/option'
   autoload :Help,      'optitron/help'
+  autoload :CLI,       'optitron/cli'
 
   InvalidParser = Class.new(RuntimeError)
 
