@@ -10,6 +10,7 @@ class CLIExample < Optitron::CLI
   desc "Use this"
   class_opt 'use_opt'
   def use
+    puts "using this"
   end
 
   desc "Use this too"
@@ -25,7 +26,11 @@ end
 
 
 describe "Optitron::Parser defaults" do
-  it "should always send defaults unless you override them" do
+  it "should generate the correct help" do
     CLIExample.optitron_parser.help.strip.should == "Global options\n\n--verbose                           \n-?/--help                           # Print help message\n--use_opt                           \n--another_opt                       \n--another_opt_as_well=[NUMERIC]"
+  end
+
+  it "should dispatch" do
+    capture(:stdout) { CLIExample.dispatch(%w(use))}.should == "using this\n"
   end
 end
