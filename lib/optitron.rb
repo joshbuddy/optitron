@@ -25,12 +25,6 @@ class Optitron
     Optitron.new(&blk).parse(args)
   end
 
-  def self.dispatch(target = nil, args = ARGV, &blk)
-    optitron = Optitron.new(&blk)
-    optitron.parser.target = target
-    optitron.parser.parse(args).dispatch
-  end
-
   def help
     @parser.help
   end

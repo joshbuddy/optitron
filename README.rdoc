@@ -65,66 +65,23 @@ If you try parsing invalid parameters, get back friendly error messages
   @parser.parse(%w(kill --pid=something)).error_messages
   => ["Pid is invalid"]
 
-== Usage in a binary
-
-To use this in a file, create a parser, and tell it to dispatch to your favourite object. For instance, save this down to <tt>test.rb</tt>
-
-  class Runner
-    def install(file, opts)
-      puts "installing #{file} with #{opts}!"
-    end
-  end
-
-  Optitron.dispatch(Runner.new) {
-    opt 'verbose', "Be very loud"
-    cmd "install", "This installs things" do
-      arg "file", "The file to install"
-    end
-    cmd "show", "This shows things" do
-      arg "first", "The first thing to show"
-      arg "second", "The second optional thing to show", :required => false
-    end
-    cmd "kill", "This kills things" do
-      opt "pids", "A list of pids to kill", :type => :array
-      opt "pid", "A pid to kill", :type => :numeric
-      opt "names", "Some sort of hash", :type => :hash
-    end
-    cmd "join", "This joins things" do
-      arg "thing", "Stuff to join", :type => :greedy
-    end
-  }
-
-Now, try running it.
-
-  crapbook-pro:optitron joshua$ ruby test.rb 
-  Unknown command
-  
-  crapbook-pro:optitron joshua$ ruby test.rb install
-  File is required
-  
-  crapbook-pro:optitron joshua$ ruby test.rb install file
-  installing file with {"verbose"=>false}!
-
-  crapbook-pro:optitron joshua$ ruby test.rb install file --verbose
-  installing file with {"verbose"=>true}!
-
 == Usage in a class
 
   require 'optitron'
-  
+
   class Runner < Optitron::CLI
-  
+
     class_opt 'verbose'
-  
+
     desc "Install stuff"
     opt 'force'
     def install(file, source)
       puts "install some things #{file} from #{source.inspect} #{params.inspect}"
     end
   end
-  
+
   Runner.dispatch
-  
+
 Running this gives you
 
   crapbook-pro:optitron joshua$ ruby ideal.rb --help

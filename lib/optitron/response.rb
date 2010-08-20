@@ -57,16 +57,6 @@ class Optitron
       end
     end
 
-    def dispatch
-      raise unless @parser.target
-      if valid?
-        dispatch_args = params.empty? ? args : args + [params]
-        @parser.target.send(command.to_sym, *dispatch_args)
-      else
-        puts error_messages.join("\n")
-      end
-    end
-
     def valid?
       @errors.empty?
     end
