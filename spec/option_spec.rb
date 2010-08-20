@@ -112,4 +112,25 @@ describe "Optitron::Parser options" do
       @parser.parse(%w(-123o test)).params.should == {'option' => 'test', '1' => true, '2' => true, '3' => true}
     end
   end
+
+  context "required options" do
+    before(:each) do
+      @parser = Optitron.new {
+        cmd "install" do
+          opt "environment", :type => :string, :required => true
+        end
+      }
+    end
+    
+    it "shouldn't parse 'install'" do
+      @parser.parse(%w(install)).valid?.should be_false
+    end
+
+    it "should parse 'install -esomething'" do
+      response = @parser.parse(%w(install -esomething))
+      response.valid?.should be_true
+      response.params.should == {'environment' => 'something'}
+    end
+  end
+
 end

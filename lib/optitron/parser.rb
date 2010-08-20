@@ -45,6 +45,8 @@ class Optitron
         if opt_tok = tokens.find { |tok| opt.match?(tok) }
           opt_tok_index = tokens.index(opt_tok)
           opt.consume(response, tokens)
+        elsif opt.required?
+          response.add_error("required", opt.name)
         end
       end
     end

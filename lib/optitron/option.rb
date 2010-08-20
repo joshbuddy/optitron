@@ -89,7 +89,8 @@ class Optitron
     end
 
     class Opt < Option
-      attr_accessor :short_name, :run, :parent_cmd
+      attr_accessor :short_name, :run, :parent_cmd, :include_in_params
+      alias_method :include_in_params?, :include_in_params
       def initialize(name, desc = nil, opts = nil)
         if desc.is_a?(Hash)
           desc, opts = nil, desc
@@ -99,6 +100,8 @@ class Optitron
         self.short_name = opts[:short_name] if opts && opts[:short_name]
         self.run = opts[:run] if opts && opts[:run]
         self.inclusion_test = opts[:in] if opts && opts[:in]
+        self.required = opts && opts.key?(:required) ? opts[:required] : false
+        self.include_in_params = opts && opts.key?(:include_in_params) ? opts[:include_in_params] : true
         self.default = opts && opts.key?(:default) ? opts[:default] : (@type == :boolean ? false : nil)
       end
 
