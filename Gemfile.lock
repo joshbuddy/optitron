@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    optitron (0.0.10)
+    optitron (0.0.11)
       callsite (= 0.0.4)
       ruby2ruby (= 1.2.4)
       ruby_parser (>= 2.0)

@@ -130,13 +130,13 @@ Running this gives you
   crapbook-pro:optitron joshua$ ruby ideal.rb --help
   Commands
 
-  install [file] <required="yourmom">       # Install stuff
-    -f/--force                              
+  install [file] <source="yourmom">       # Install stuff
+    -f/--force                            
 
   Global options
 
-  -v/--verbose                              
-  -?/--help                                 # Print help message
+  -v/--verbose                            
+  -?/--help                               # Print help message
 
   crapbook-pro:optitron joshua$ ruby ideal.rb install
   File is required
