@@ -22,6 +22,10 @@ class CLIExample < Optitron::CLI
   opt 'another_opt_as_well', :default => 123
   def use_greedy(one, *two)
   end
+
+  desc "something with an array"
+  def with_array(ary=[1,2,3])
+  end
 end
 
 class AnotherCLIExample < Optitron::CLI
@@ -43,7 +47,7 @@ end
 describe "Optitron::Parser defaults" do
   it "should generate the correct help" do
     CLIExample.build
-    CLIExample.optitron_parser.help.strip.should == "Commands\n\nuse_greedy [one] [two1 two2 ...]       # Use this three\n  -A/--another_opt_as_well=[NUMERIC]   \nuse_too [one] <required=\"three\">       # Use this too\n  -a/--another_opt                     \nuse                                    # Use this\n  -u/--use_opt                         \n\nGlobal options\n\n-v/--verbose                           \n-?/--help                              # Print help message"
+    CLIExample.optitron_parser.help.strip.should == "Commands\n\nuse_greedy [one] [two1 two2 ...]       # Use this three\n  -A/--another_opt_as_well=[NUMERIC]   \nuse                                    # Use this\n  -u/--use_opt                         \nwith_array <ary=[1, 2, 3]>             # something with an array\nuse_too [one] <two=\"three\">            # Use this too\n  -a/--another_opt                     \n\nGlobal options\n\n-v/--verbose                           \n-?/--help                              # Print help message"
   end
 
   it "should dispatch" do
@@ -52,7 +56,7 @@ describe "Optitron::Parser defaults" do
 
   it "should generate the correct help" do
     AnotherCLIExample.build
-    AnotherCLIExample.optitron_parser.help.strip.should == "Commands\n\nuse_too [one] <required=\"three\">       # Use this too\n  -a/--another_opt                     \n\nGlobal options\n\n-v/--verbose                           \n-?/--help                              # Print help message"
+    AnotherCLIExample.optitron_parser.help.strip.should == "Commands\n\nuse_too [one] <two=\"three\">       # Use this too\n  -a/--another_opt                \n\nGlobal options\n\n-v/--verbose                      \n-?/--help                         # Print help message"
   end
 
   it "should dispatch with a custom initer" do

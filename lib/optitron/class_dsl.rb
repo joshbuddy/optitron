@@ -47,9 +47,12 @@ class Optitron
           when :block
             lasgn = t.shift
             lasgn.shift
-            arg_list[-1].shift
-            arg_list[-1] << :optional
-            arg_list[-1] << @ruby2ruby.process(lasgn.last)
+            name = lasgn.shift
+            sub_part = arg_list.find{|arg| arg.first == name}
+            sub_part.clear
+            sub_part << name
+            sub_part << :optional
+            sub_part << @ruby2ruby.process(lasgn.last)
           end
         end
       end
