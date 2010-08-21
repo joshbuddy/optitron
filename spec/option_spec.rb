@@ -133,4 +133,20 @@ describe "Optitron::Parser options" do
     end
   end
 
+  context "array options with a comment" do
+    before(:each) do
+      @parser = Optitron.new {
+        cmd "install" do
+          opt "things", :type => :array
+        end
+      }
+    end
+    
+    it "should parse '--things=one two three install'" do
+      response = @parser.parse(%w(--things=one two three install))
+      response.valid?.should be_true
+      response.params.should == {'things' => ['one', 'two', 'three']}
+    end
+  end
+
 end
