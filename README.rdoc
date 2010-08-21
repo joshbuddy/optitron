@@ -2,11 +2,11 @@
 
 == Sensible options parsing
 
-Optitron strives to be simple, minimal and to do the "right thing" most of the time. The structure is simple, you have global options, a list of commands, and each of those commands takes a number of arguments and options.
+Optitron strives to be simple, minimal and to do the "right thing" most of the time. The structure is easy: you have global options, a list of commands, and each of those commands takes a number of arguments and options.
 
 == Usage
 
-To create an Optitron CLI, start with a class you want to wire up as a CLI. In our example, we'll use the class Runner, which we want to work as a CLI.
+To create an Optitron command line interface (CLI), start with a class you want to wire up as a CLI. In our example, we'll use the class Runner, which we want to work as a CLI.
 
   class Runner
     def start
@@ -41,7 +41,48 @@ To make this class suitable for use as a CLI, either extend <tt>Optitron::CLI</t
     end
   end
 
-Only methods described will be available to the CLI. If you have a method that needs arguments, simply include them as method arguments. It will respect splats and defaults. Options are specified with the +opt+ method in your class, as follows:
+=== Help command
+
+Help is added by default, but, if you don't want to use this, include the command +dont_use_help+ in your class. Help is available from either <tt>--help</tt> or <tt>-?</tt>.
+
+=== Arguments
+
+Only methods described will be available to the CLI. If you have a method that needs arguments, simply include them as method arguments. It will respect splats and defaults. For instance
+
+  desc "Starts the process"
+  def start(mode)
+    # ... starts
+  end
+
+Will generate
+
+  start [mode]       # Starts the process
+  
+In your help file.
+
+  desc "Starts the process"
+  def start(mode = 'production')
+    # ... starts
+  end
+
+Will generate
+
+  start <mode="production">       # Starts the process
+
+And
+
+  desc "Starts the process"
+  def start(*modes)
+    # ... starts
+  end
+
+Will generate
+
+  start <modes1 modes2 ...>       # Starts the process
+
+=== Options
+
+Options are specified with the +opt+ method in your class, as follows:
 
   class Runner < Optitron::CLI
     desc "Starts the process"
@@ -70,10 +111,6 @@ The last line in your runner has to be the class name and dispatch. This will pa
     # ... your methods
   end
   Runner.dispatch
-  
-As well, help is added by default, but, if you don't want to use this, include the command +dont_use_help+ in your class.
-  
-== How to configure options
 
 Options can have defaults, types and inclusion checks. Here are all the options available on an opt:
 
