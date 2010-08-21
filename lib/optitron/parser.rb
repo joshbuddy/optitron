@@ -5,7 +5,7 @@ class Optitron
     
     def initialize
       @options = []
-      @commands = {}
+      @commands = []
       @args = []
       @short_opts = {}
       @help = Help.new(self)
@@ -22,11 +22,11 @@ class Optitron
       args = @args
       unless @commands.empty?
         potential_cmd_toks = tokens.select { |t| t.respond_to?(:lit) }
-        if cmd_tok = potential_cmd_toks.find { |t| @commands[t.lit] }
+        if cmd_tok = potential_cmd_toks.find { |t| @commands.assoc(t.lit) }
           tokens.delete(cmd_tok)
           response.command = cmd_tok.lit
-          options += @commands[cmd_tok.lit].options
-          args = @commands[cmd_tok.lit].args
+          options += @commands.assoc(cmd_tok.lit).last.options
+          args = @commands.assoc(cmd_tok.lit).last.args
         else
           potential_cmd_toks.first ?
             response.add_error('an unknown command', potential_cmd_toks.first.lit) :
@@ -52,7 +52,7 @@ class Optitron
     end
     
     def parse_args(tokens, args, response)
-      args.each { |arg| arg.consume(response, tokens) } if args
+      args.each { |arg| arg.consume(response, tokens) }
     end
   end
 end

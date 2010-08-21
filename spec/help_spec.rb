@@ -17,10 +17,10 @@ describe "Optitron::Parser help" do
         opt "names", "Some sort of hash", :type => :hash
       end
       cmd "join", "This joins things" do
-        arg "thing", "Stuff to join", :type => :greedy
+        arg "thing", "Stuff to join", :type => :greedy, :required => true
       end
     }
-    @parser.help.should == "Commands\n\nshow [first] <second>          # This shows things\ninstall [file]                 # This installs things\nkill                           # This kills things\n  -p/--pids=[ARRAY]            # A list of pids to kill\n  -P/--pid=[NUMERIC]           # A pid to kill\n  -n/--names=[HASH]            # Some sort of hash\njoin [thing1 thing2 ...]       # This joins things\n\nGlobal options\n\n-v/--verbose                   # Be very loud"
+    @parser.help.should == "Commands\n\ninstall [file]                 # This installs things\nshow [first] <second>          # This shows things\nkill                           # This kills things\n  -p/--pids=[ARRAY]            # A list of pids to kill\n  -P/--pid=[NUMERIC]           # A pid to kill\n  -n/--names=[HASH]            # Some sort of hash\njoin [thing1 thing2 ...]       # This joins things\n\nGlobal options\n\n-v/--verbose                   # Be very loud"
   end
 
   it "generate help for non-command parsers" do

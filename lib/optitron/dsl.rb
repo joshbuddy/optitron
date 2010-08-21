@@ -40,8 +40,8 @@ class Optitron
       end
       
       def arg(name, description = nil, opts = nil)
-        arg_option = Option::Arg.new(name, description, opts)
-        raise InvalidParser.new if @target.args.last and !@target.args.last.required? and arg_option.required?
+        arg_option = Option::Arg.new(name, description, opts)                                                                         
+        raise InvalidParser.new if @target.args.last and !@target.args.last.required? and arg_option.required? and arg_option.type != :greedy
         raise InvalidParser.new if @target.args.last and @target.args.last.type == :greedy
         @target.args << arg_option
         arg_option
@@ -100,7 +100,7 @@ class Optitron
       def cmd(name, description = nil, opts = nil, &blk)
         command_option = Option::Cmd.new(name, description, opts)
         CmdParserDsl.new(self, command_option).configure_with(&blk) if blk
-        @target.commands[name] = command_option
+        @target.commands << [name, command_option]
       end
     end
   end

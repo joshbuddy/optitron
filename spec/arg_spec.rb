@@ -90,11 +90,11 @@ describe "Optitron::Parser arg spec" do
     end
   end
 
-  context "one greedy arg" do
+  context "one required greedy arg" do
     before(:each) {
       @parser = Optitron.new {
         cmd "install" do
-          arg "files", :type => :greedy
+          arg "files", :type => :greedy, :required => true
         end
       }
     }
@@ -118,6 +118,25 @@ describe "Optitron::Parser arg spec" do
       response.args.should == ['life.rb', 'life.rb']
       response.valid?.should be_true
     end
+  end
+
+  context "one optional + one greedy arg" do
+    before(:each) {
+      @parser = Optitron.new {
+        cmd "install" do
+          arg "values", :default => [1,2,3]
+          arg "files", :type => :greedy
+        end
+      }
+    }
+
+    it "should parse 'install'" do
+      response = @parser.parse(%w(install))
+      response.command.should == 'install'
+      response.args.should == [[1,2,3]]
+      response.valid?.should be_true
+    end
+
   end
 
   context "invalid parsers" do

@@ -183,16 +183,15 @@ class Optitron
     
     class Arg < Option
       attr_accessor :greedy, :inclusion_test, :parent_cmd
-      alias_method :greedy?, :greedy
       def initialize(name = nil, desc = nil, opts = nil)
         if desc.is_a?(Hash)
           desc, opts = nil, desc
         end
         @name, @desc = name, desc
         self.inclusion_test = opts[:in] if opts && opts[:in]
-        @default = opts && opts[:default]
-        @required = opts && opts.key?(:required) ? opts[:required] : @default.nil?
-        @type = opts && opts[:type]
+        self.default = opts && opts[:default]
+        self.type = opts && opts[:type]
+        self.required = opts && opts.key?(:required) ? opts[:required] : (@default.nil? and !greedy?)
       end
       
       def consume(response, tokens)
@@ -202,7 +201,7 @@ class Optitron
           while !arg_tokens.size.zero?
             arg_tok = arg_tokens.shift
             tokens.delete_at(tokens.index(arg_tok))
-            response.args_with_tokens.last.last << arg_tok
+            response.args_with_tokens.last.last << arg_tok.lit
           end
           if required? and response.args_with_tokens.last.last.size.zero?
             response.add_error("required", name)
@@ -213,7 +212,9 @@ class Optitron
           elsif !arg_tokens.size.zero?
             arg_tok = arg_tokens.shift
             tokens.delete_at(tokens.index(arg_tok))
-            response.args_with_tokens << [self, arg_tok]
+            response.args_with_tokens << [self, arg_tok.lit]
+          elsif has_default
+            response.args_with_tokens << [self, default]
           end
         end
       end

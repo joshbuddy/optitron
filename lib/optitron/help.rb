@@ -27,15 +27,15 @@ class Optitron
     end
 
     def generate
-      cmds = {}
-      @parser.commands.each do |cmd_name, cmd|
+      cmds = []
+      @parser.commands.each do |(cmd_name, cmd)|
         cmd_line = "#{cmd_name}"
         cmd.args.each do |arg|
           cmd_line << " " << help_line_for_arg(arg)
         end
-        cmds[cmd_line] = [cmd.desc]
+        cmds << [cmd_line, cmd.desc]
         cmd.options.each do |opt|
-          cmds[cmd_line] << help_line_for_opt(opt)
+          cmds.assoc(cmd_line) << help_line_for_opt(opt)
         end
       end
       opts_lines = @parser.options.map do |opt|
@@ -45,7 +45,7 @@ class Optitron
       args_lines = @parser.args.empty? ? nil : [@parser.args.map{|arg| help_line_for_arg(arg)}.join(' '), @parser.args.map{|arg| arg.desc}.join(', ')]
 
       longest_line = 0
-      longest_line = [longest_line, cmds.keys.map{|k| k.size}.max].max unless cmds.empty?
+      longest_line = [longest_line, cmds.map{|cmd| cmd.first.size}.max].max unless cmds.empty?
       opt_lines = cmds.map{|k,v| k.size + 2}.flatten
       longest_line = [longest_line, args_lines.first.size].max if args_lines
       longest_line = [longest_line, opt_lines.max].max unless opt_lines.empty?
@@ -53,7 +53,7 @@ class Optitron
       help_output = []
 
       unless cmds.empty?
-        help_output << "Commands\n\n" + cmds.map do |cmd, opts|
+        help_output << "Commands\n\n" + cmds.map do |(cmd, *opts)|
           cmd_text = ""
           cmd_text << "%-#{longest_line}s     " % cmd
           cmd_desc = opts.shift
