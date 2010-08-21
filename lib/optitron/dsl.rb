@@ -84,7 +84,7 @@ class Optitron
 
       def help(desc = "Print help message")
         configure_with {
-          opt 'help', desc, :short_name => '?', :include_in_params => false, :run => proc{ |value, response|
+          opt 'help', desc, :short_name => '?', :run => proc{ |value, response|
             if value
               puts @target.help
               exit(0)

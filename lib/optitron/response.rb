@@ -23,8 +23,7 @@ class Optitron
     def compile_params
       @params_array.each do |(key, value)|
         begin
-          validated_value = key.validate(value)
-          params[key.name] = validated_value if key.include_in_params?
+          params[key.name] = key.validate(value)
         rescue
           add_error('invalid', key.name)
           params[key.name] = value

@@ -4,10 +4,23 @@ class Optitron
       @parser = parser
     end
 
+    def help_line_for_opt_value(opt)
+      if opt.inclusion_test
+        case opt.inclusion_test
+        when Array
+          opt.inclusion_test.join(', ')
+        else
+          opt.inclusion_test.inspect
+        end
+      else
+        opt.type.to_s.upcase
+      end
+    end
+
     def help_line_for_opt(opt)
       opt_line = ''
       opt_line << [opt.short_name ? "-#{opt.short_name}" : nil, "--#{opt.name}"].compact.join('/')
-      opt_line << "=[#{opt.type.to_s.upcase}]" unless opt.boolean?
+      opt_line << "=[#{help_line_for_opt_value(opt)}]" unless opt.boolean?
       [opt_line, opt.desc]
     end
 

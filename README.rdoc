@@ -2,7 +2,108 @@
 
 == Sensible options parsing
 
-You can specify lots of different commands with options
+Optitron strives to be simple, minimal and to do the "right thing" most of the time. The structure is simple, you have global options, a list of commands, and each of those commands takes a number of arguments and options.
+
+== Usage
+
+To create an Optitron CLI, start with a class you want to wire up as a CLI. In our example, we'll use the class Runner, which we want to work as a CLI.
+
+  class Runner
+    def start
+      # ... starts
+    end
+    
+    def stop
+      # ... stops
+    end
+    
+    def status
+      # ... reports status
+    end
+  end
+
+To make this class suitable for use as a CLI, either extend <tt>Optitron::CLI</tt> or include <tt>Optitron::ClassDsl</tt>. Then, describe each argument as follows:
+
+  class Runner < Optitron::CLI
+    desc "Starts the process"
+    def start
+      # ... starts
+    end
+    
+    desc "Stops the process"
+    def stop
+      # ... stops
+    end
+    
+    desc "Report the status"
+    def status
+      # ... reports status
+    end
+  end
+
+Only methods described will be available to the CLI. If you have a method that needs arguments, simply include them as method arguments. It will respect splats and defaults. Options are specified with the +opt+ method in your class, as follows:
+
+  class Runner < Optitron::CLI
+    desc "Starts the process"
+    opt "verbose"
+    opt "environment", :in => ['development', 'production', 'staging', 'test']
+    def start
+      # ... starts
+    end
+    
+    # .. more methods
+
+  end
+
+
+If you need an option available for all methods, use +class_opt+ to specify it.
+
+  class Runner < Optitron::CLI
+    class_opt "verbose", "Be loud"
+  
+    # ... your methods
+  end
+
+The last line in your runner has to be the class name and dispatch. This will parse <tt>ARGV</tt> and execute normal dispatching on it.
+
+  class Runner < Optitron::CLI
+    # ... your methods
+  end
+  Runner.dispatch
+  
+As well, help is added by default, but, if you don't want to use this, include the command +dont_use_help+ in your class.
+  
+== How to configure options
+
+Options can have defaults, types and inclusion checks. Here are all the options available on an opt:
+
+=== <tt>:default</tt>
+
+This allows you to specify a default value. The type of value is used to infer the type required for this option. This can be over-ridden with <tt>:type</tt>.
+
+=== <tt>:short_name</tt>
+
+This allows you to set a short name for the option, though, one will be assigned automatically from the short names available.
+
+=== <tt>:run</tt>
+
+This allows you to run an arbitrary block for an option. The proc will be called with the value, and the response object.
+
+=== <tt>:in</tt>
+
+This allows you to test for inclusion in a range or array (or anything that responds to <tt>#include?</tt> and <tt>#first</tt>). The first item in the object will be used to infer the type. This can be over-ridden with <tt>:type</tt>.
+
+=== <tt>:required</tt>
+
+This allows you to force an option to be required. False by default.
+
+==== <tt>:type</tt>
+
+This allows you to specify the type. Acceptable options are <tt>:numeric</tt>, <tt>:array</tt>, <tt>:hash</tt>, <tt>:string</tt> or <tt>:boolean</tt>.
+
+== Stand alone usage
+
+You can create parsers and parse using them.
 
   @parser = Optitron.new {
     help
@@ -24,11 +125,11 @@ You can specify lots of different commands with options
     end
   }
 
-Want to see the help?
+To generate help, use the <tt>#help</tt> method.
 
   @parser.help
 
-Will output:
+Which returns,
 
   Commands
   
@@ -44,7 +145,7 @@ Will output:
   
   -v/--verbose                   # Be very loud
 
-And <tt>@parser.parse(%w(-v install file))</tt> gives back:
+The parse method can parse a list of arguments. For example, <tt>@parser.parse(%w(-v install file))</tt> gives back:
 
   response = @parser.parse(%w(-v install file))
   response.command
@@ -54,7 +155,7 @@ And <tt>@parser.parse(%w(-v install file))</tt> gives back:
   response.params
   => {"verbose" => true}
 
-If you try parsing invalid parameters, get back friendly error messages
+If you try parsing invalid parameters, you can get back friendly error messages using <tt>#error_messages</tt>.
 
   @parser.parse(%w()).error_messages
   => ["Unknown command"]
@@ -64,45 +165,3 @@ If you try parsing invalid parameters, get back friendly error messages
   => ["File is required"]
   @parser.parse(%w(kill --pid=something)).error_messages
   => ["Pid is invalid"]
-
-== Usage in a class
-
-  require 'optitron'
-
-  class Runner < Optitron::CLI
-
-    class_opt 'verbose'
-
-    desc "Install stuff"
-    opt 'force'
-    def install(file, source)
-      puts "install some things #{file} from #{source.inspect} #{params.inspect}"
-    end
-  end
-
-  Runner.dispatch
-
-Running this gives you
-
-  crapbook-pro:optitron joshua$ ruby ideal.rb --help
-  Commands
-
-  install [file] <source="yourmom">       # Install stuff
-    -f/--force                            
-
-  Global options
-
-  -v/--verbose                            
-  -?/--help                               # Print help message
-
-  crapbook-pro:optitron joshua$ ruby ideal.rb install
-  File is required
-
-  crapbook-pro:optitron joshua$ ruby ideal.rb install file
-  installing file from yourmom with params: {"help"=>false, "force"=>false, "verbose"=>false}
-
-  crapbook-pro:optitron joshua$ ruby ideal.rb install file yourdad
-  installing file from yourdad with params: {"help"=>false, "force"=>false, "verbose"=>false}
-
-  crapbook-pro:optitron joshua$ ruby ideal.rb install file yourdad -v
-  installing file from yourdad with params: {"help"=>false, "force"=>false, "verbose"=>true}

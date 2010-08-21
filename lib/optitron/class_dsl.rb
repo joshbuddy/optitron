@@ -126,7 +126,7 @@ class Optitron
 
       def build
         unless @built
-          optitron_dsl.root.help unless send(:class_variable_defined?, :@@suppress_help)
+          optitron_dsl.root.help# if send(:class_variable_defined?, :@@suppress_help)
           @cmds.each do |(cmd_name, cmd_desc, opts)|
             args = method_args[cmd_name.to_sym]
             arity = instance_method(cmd_name).arity
