@@ -43,6 +43,19 @@ class AnotherCLIExample < Optitron::CLI
   end
 end
 
+class NoHelpExample < Optitron::CLI
+
+  dont_use_help
+
+  class_opt 'verbose'
+
+  desc "Use this too"
+  opt 'another_opt'
+  def use_too(one, two = 'three')
+    puts "using this too #{one} #{two} #{params['another_opt']} #{@env}"
+  end
+end
+
 
 describe "Optitron::Parser defaults" do
   it "should generate the correct help" do
@@ -61,5 +74,9 @@ describe "Optitron::Parser defaults" do
 
   it "should dispatch with a custom initer" do
     capture(:stdout) { AnotherCLIExample.dispatch(%w(use_too three four --another_opt)) { AnotherCLIExample.new("test") }  }.should == "using this too three four true test\n"
+  end
+
+  it "should be able to suppress help" do
+    capture(:stdout) { NoHelpExample.dispatch(%w(--help)) }.should == "Unknown command\nHelp is unrecognized\n"
   end
 end

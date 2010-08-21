@@ -96,12 +96,12 @@ class Optitron
       end
 
       def build_method_args(file)
-        unless self.send(:class_variable_defined?, :@@method_args)
+        unless send(:class_variable_defined?, :@@method_args)
           parser = RubyParser.new
           sexp = parser.process(File.read(file))
           method_args = MethodArgs.new(self)
           method_args.process(sexp)
-          self.send(:class_variable_set, :@@method_args, method_args.method_map)
+          send(:class_variable_set, :@@method_args, method_args.method_map)
         end
         send(:class_variable_get, :@@method_args)
       end
@@ -111,7 +111,7 @@ class Optitron
       end
 
       def dont_use_help
-        optitron_dsl.root.help
+        send(:class_variable_set, :@@suppress_help, true)
       end
 
       def desc(desc)
@@ -126,7 +126,7 @@ class Optitron
 
       def build
         unless @built
-          optitron_dsl.root.help
+          optitron_dsl.root.help unless send(:class_variable_defined?, :@@suppress_help)
           @cmds.each do |(cmd_name, cmd_desc, opts)|
             args = method_args[cmd_name.to_sym]
             arity = instance_method(cmd_name).arity
