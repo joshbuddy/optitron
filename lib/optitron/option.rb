@@ -194,30 +194,29 @@ class Optitron
         self.required = opts && opts.key?(:required) ? opts[:required] : (@default.nil? and !greedy?)
       end
       
+      def consume_array(response, tokens)
+        arg_tokens = tokens.select{ |tok| tok.respond_to?(:lit) }
+        response.args_with_tokens << [self, []]
+        while arg_tokens.first
+          if val = yield(arg_tokens.first)
+            arg_tok = arg_tokens.shift
+            tokens.delete_at(tokens.index(arg_tok))
+            response.args_with_tokens.last.last << val
+          end
+        end
+        if required? and response.args_with_tokens.last.last.size.zero?
+          response.add_error("required", name)
+        end
+      end
+
       def consume(response, tokens)
         arg_tokens = tokens.select{ |tok| tok.respond_to?(:lit) }
         case type
-        when :greedy
-          response.args_with_tokens << [self, []]
-          while !arg_tokens.size.zero?
-            arg_tok = arg_tokens.shift
-            tokens.delete_at(tokens.index(arg_tok))
-            response.args_with_tokens.last.last << arg_tok.lit
-          end
-          if required? and response.args_with_tokens.last.last.size.zero?
-            response.add_error("required", name)
-          end
+        when :greedy, :array
+          consume_array(response, tokens) { |t| t.lit }
         when :hash
-          response.args_with_tokens << [self, {}]
-          while arg_tokens.first and arg_tokens.first.lit[':']
-            arg_tok = arg_tokens.shift
-            tokens.delete_at(tokens.index(arg_tok))
-            k, v = arg_tok.lit.split(':', 2)
-            response.args_with_tokens.last.last[k] = v
-          end
-          if required? and response.args_with_tokens.last.last.size.zero?
-            response.add_error("required", name)
-          end
+          consume_array(response, tokens) { |t| t.lit[':'] && t.lit.split(':', 2) }
+          response.args_with_tokens.last[-1] = Hash[response.args_with_tokens.last[-1]]
         else
           if arg_tokens.size.zero? and required?
             response.add_error("required", name)
