@@ -80,6 +80,29 @@ Will generate
 
   start <modes1 modes2 ...>       # Starts the process
 
+As well, you can provide type hints to the args:
+
+  desc "Does something awesome"
+  arg_types :numeric, :string, :boolean
+  def start(number, string, truth)
+    # ... does something
+  end
+
+Will generate
+
+  start [number] [string] [truth]       # Does something awesome
+
+And those arguments have to conform to the types given. For instance, calling this with
+
+  start 123 something flase
+  
+Will produce the error <tt>Truth is invalid</tt>. Calling with
+
+  start 123 something true
+  
+however, will correctly invoke the method.
+
+
 === Options
 
 Options are specified with the +opt+ method in your class, as follows:
