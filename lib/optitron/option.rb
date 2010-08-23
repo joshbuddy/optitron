@@ -197,11 +197,13 @@ class Optitron
       def consume_array(response, tokens)
         arg_tokens = tokens.select{ |tok| tok.respond_to?(:lit) }
         response.args_with_tokens << [self, []]
-        while arg_tokens.first
+        while !arg_tokens.size.zero?
           if val = yield(arg_tokens.first)
             arg_tok = arg_tokens.shift
             tokens.delete_at(tokens.index(arg_tok))
             response.args_with_tokens.last.last << val
+          else
+            break
           end
         end
         if required? and response.args_with_tokens.last.last.size.zero?
@@ -210,7 +212,6 @@ class Optitron
       end
 
       def consume(response, tokens)
-        arg_tokens = tokens.select{ |tok| tok.respond_to?(:lit) }
         case type
         when :greedy, :array
           consume_array(response, tokens) { |t| t.lit }
@@ -218,14 +219,12 @@ class Optitron
           consume_array(response, tokens) { |t| t.lit[':'] && t.lit.split(':', 2) }
           response.args_with_tokens.last[-1] = Hash[response.args_with_tokens.last[-1]]
         else
-          if arg_tokens.size.zero? and required?
+          arg_token = tokens.find{ |tok| tok.respond_to?(:lit) }
+          if arg_token || has_default
+            tokens.delete_at(tokens.index(arg_token)) if arg_token
+            response.args_with_tokens << [self, arg_token ? arg_token.lit : default]
+          elsif !arg_token and required?
             response.add_error("required", name)
-          elsif !arg_tokens.size.zero?
-            arg_tok = arg_tokens.shift
-            tokens.delete_at(tokens.index(arg_tok))
-            response.args_with_tokens << [self, arg_tok.lit]
-          elsif has_default
-            response.args_with_tokens << [self, default]
           end
         end
       end
