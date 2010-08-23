@@ -124,20 +124,25 @@ class Optitron
         @opts << [name, desc, opts]
       end
 
+      def arg_types(*types)
+        @arg_types = types
+      end
+
       def build
         unless @built
           optitron_dsl.root.help unless send(:class_variable_defined?, :@@suppress_help)
           @cmds.each do |(cmd_name, cmd_desc, opts)|
             args = method_args[cmd_name.to_sym]
             arity = instance_method(cmd_name).arity
+            arg_types = @arg_types
             optitron_dsl.root.cmd(cmd_name, cmd_desc) do
               opts.each { |o| opt *o }
               args.each do |(arg_name, arg_type, arg_default)|
                 case arg_type
                 when :required
-                  arg arg_name.to_s, :default => arg_default && eval(arg_default)
+                  arg arg_name.to_s, :default => arg_default && eval(arg_default), :type => arg_types && arg_types.shift
                 when :optional
-                  arg arg_name.to_s, :default => arg_default && eval(arg_default), :required => false
+                  arg arg_name.to_s, :default => arg_default && eval(arg_default), :required => false, :type => arg_types && arg_types.shift
                 when :greedy
                   arg arg_name.to_s, :default => arg_default && eval(arg_default), :type => :greedy
                 end

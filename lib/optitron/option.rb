@@ -196,12 +196,24 @@ class Optitron
       
       def consume(response, tokens)
         arg_tokens = tokens.select{ |tok| tok.respond_to?(:lit) }
-        if type == :greedy
+        case type
+        when :greedy
           response.args_with_tokens << [self, []]
           while !arg_tokens.size.zero?
             arg_tok = arg_tokens.shift
             tokens.delete_at(tokens.index(arg_tok))
             response.args_with_tokens.last.last << arg_tok.lit
+          end
+          if required? and response.args_with_tokens.last.last.size.zero?
+            response.add_error("required", name)
+          end
+        when :hash
+          response.args_with_tokens << [self, {}]
+          while arg_tokens.first and arg_tokens.first.lit[':']
+            arg_tok = arg_tokens.shift
+            tokens.delete_at(tokens.index(arg_tok))
+            k, v = arg_tok.lit.split(':', 2)
+            response.args_with_tokens.last.last[k] = v
           end
           if required? and response.args_with_tokens.last.last.size.zero?
             response.add_error("required", name)

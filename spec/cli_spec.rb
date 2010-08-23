@@ -15,7 +15,9 @@ class CLIExample < Optitron::CLI
 
   desc "Use this too"
   opt 'another_opt'
+  arg_types :hash
   def use_too(one, two = 'three')
+    puts "one: #{one.inspect} #{two.inspect}"
   end
 
   desc "Use this three"
@@ -65,6 +67,10 @@ describe "Optitron::Parser defaults" do
 
   it "should dispatch" do
     capture(:stdout) { CLIExample.dispatch(%w(use))}.should == "using this\n"
+  end
+
+  it "should dispatch with the type hinting" do
+    capture(:stdout) { CLIExample.dispatch(%w(use_too one:two three:four))}.should == "one: {\"three\"=>\"four\", \"one\"=>\"two\"} \"three\"\n"
   end
 
   it "should generate the correct help" do

@@ -177,4 +177,22 @@ describe "Optitron::Parser arg spec" do
       response.valid?.should be_true
     end
   end
+
+  context "various arg types" do
+    before(:each) {
+      @parser = Optitron.new {
+        cmd "install" do
+          arg "file", :type => :hash
+        end
+      }
+    }
+
+    it "should parse" do
+      response = @parser.parse(%w(install test:one test2:two))
+      response.command.should == 'install'
+      response.args.should == [{'test' => 'one', 'test2' => 'two'}]
+      response.valid?.should be_true
+    end
+  end
+
 end
