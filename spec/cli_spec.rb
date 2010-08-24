@@ -1,5 +1,14 @@
 require 'spec_helper'
 
+module AModule
+  class CLIInAModule < Optitron::CLI
+    desc "a method"
+    def method(arg1)
+      puts "calling with #{arg1}"
+    end
+  end
+end
+
 class CLIExample < Optitron::CLI
 
   def a_method_we_didnt_describe
@@ -100,5 +109,10 @@ describe "Optitron::Parser defaults" do
 
   it "should get type hinting from arg names" do
     capture(:stdout) { CLIExampleWithArgHinting.dispatch(%w(use_too asd 123)) }.should == "using this too \"asd\" 123\n"
+  end
+  
+  it "should dispatch from within a module" do
+    AModule::CLIInAModule.build
+    AModule::CLIInAModule.optitron_parser.help.should == "Commands\n\nmethod [arg1]       # a method\n\nGlobal options\n\n-?/--help           # Print help message"
   end
 end

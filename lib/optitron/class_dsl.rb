@@ -10,13 +10,24 @@ class Optitron
     def initialize(cls)
       @cls = cls
       @method_map = {}
+      @current_class = []
       super()
+    end
+
+    def process_module(exp)
+      exp.shift
+      @current_class << exp.first.to_sym
+      process(exp)
+      @current_class.pop
+      exp.clear
+      exp
     end
 
     def process_class(exp)
       exp.shift
-      @current_class = exp.first.to_sym
+      @current_class << exp.first.to_sym
       process(exp)
+      @current_class.pop
       exp.clear
       exp
     end
@@ -56,7 +67,8 @@ class Optitron
           end
         end
       end
-      @method_map[@current_method] = arg_list if @cls.name.to_sym == @current_class
+      @cls
+      @method_map[@current_method] = arg_list if @cls.name == @current_class.map{|c| c.to_s}.join('::')
     end
   end
   
