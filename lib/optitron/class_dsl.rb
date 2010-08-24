@@ -130,6 +130,7 @@ class Optitron
 
       def build
         unless @built
+          target = optitron_parser.target
           optitron_dsl.root.help unless send(:class_variable_defined?, :@@suppress_help)
           @cmds.each do |(cmd_name, cmd_desc, opts)|
             args = method_args[cmd_name.to_sym]
@@ -140,7 +141,7 @@ class Optitron
               args.each do |(arg_name, arg_type, arg_default)|
                 possible_arg_type = arg_name.to_s[/_(string|hash|array|numeric|int|float)$/, 1]
                 possible_arg_type &&= possible_arg_type.to_sym
-                arg_opts = { :default => arg_default && eval(arg_default), :type => arg_types && arg_types.shift || possible_arg_type }
+                arg_opts = { :default => arg_default && target.instance_eval(arg_default), :type => arg_types && arg_types.shift || possible_arg_type }
                 case arg_type
                 when :required
                   arg arg_name.to_s, arg_opts
@@ -158,8 +159,8 @@ class Optitron
       end
 
       def dispatch(args = ARGV, &blk)
-        build
         optitron_parser.target = blk ? blk.call : new
+        build
         response = optitron_parser.parse(args)
         if response.valid?
           optitron_parser.target.params = response.params
