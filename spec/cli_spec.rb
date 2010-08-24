@@ -17,7 +17,7 @@ class CLIExample < Optitron::CLI
   opt 'another_opt'
   arg_types :hash
   def use_too(one, two = 'three')
-    puts "one: #{one.inspect} #{two.inspect}"
+    puts "one: #{one.to_a.sort.inspect} #{two.inspect}"
   end
 
   desc "Use this three"
@@ -58,6 +58,13 @@ class NoHelpExample < Optitron::CLI
   end
 end
 
+class CLIExampleWithArgHinting < Optitron::CLI
+  desc "Use this too"
+  def use_too(one_string, two_int)
+    puts "using this too #{one_string.inspect} #{two_int.inspect}"
+  end
+end
+
 
 describe "Optitron::Parser defaults" do
   it "should generate the correct help" do
@@ -70,7 +77,7 @@ describe "Optitron::Parser defaults" do
   end
 
   it "should dispatch with the type hinting" do
-    capture(:stdout) { CLIExample.dispatch(%w(use_too one:two three:four))}.should == "one: {\"three\"=>\"four\", \"one\"=>\"two\"} \"three\"\n"
+    capture(:stdout) { CLIExample.dispatch(%w(use_too one:two three:four))}.should == 'one: [["one", "two"], ["three", "four"]] "three"' + "\n"
   end
 
   it "should generate the correct help" do
@@ -84,5 +91,9 @@ describe "Optitron::Parser defaults" do
 
   it "should be able to suppress help" do
     capture(:stdout) { NoHelpExample.dispatch(%w(--help)) }.should == "Unknown command\nHelp is unrecognized\n"
+  end
+
+  it "should get type hinting from arg names" do
+    capture(:stdout) { CLIExampleWithArgHinting.dispatch(%w(use_too asd 123)) }.should == "using this too \"asd\" 123\n"
   end
 end

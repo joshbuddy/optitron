@@ -51,6 +51,70 @@ describe "Optitron::Parser types" do
     end
   end
 
+  context "float" do
+    context "on args" do
+      before(:each) {
+        @parser = Optitron.new {
+          cmd "kill" do
+            arg 'volumne', :type => :float
+          end
+        }
+      }
+
+      it "should parse 'kill 123'" do
+        response = @parser.parse(%w(kill 123))
+        response.command.should == 'kill'
+        response.args.first.should == 123
+        response.valid?.should be_true
+      end
+
+      it "should parse 'kill 123.345'" do
+        response = @parser.parse(%w(kill 123.345))
+        response.command.should == 'kill'
+        response.args.first.should == 123.345
+        response.valid?.should be_true
+      end
+
+      it "shouldn't parse 'kill asd'" do
+        response = @parser.parse(%w(kill asd))
+        response.command.should == 'kill'
+        response.args.first.should == 'asd'
+        response.valid?.should be_false
+      end
+    end
+
+    context "on opts" do
+      before(:each) do
+        @parser = Optitron.new do
+          cmd "kill" do
+            opt 'pid', :type => :float
+          end
+        end
+      end
+
+      it "should parse 'kill --pid=123'" do
+        response = @parser.parse(%w(kill --pid=123))
+        response.command.should == 'kill'
+        response.params['pid'].should == 123
+        response.valid?.should be_true
+      end
+
+      it "should parse 'kill --pid=123.345'" do
+        response = @parser.parse(%w(kill --pid=123.345))
+        response.command.should == 'kill'
+        response.params['pid'].should == 123.345
+        response.valid?.should be_true
+      end
+
+      it "shouldn't parse 'kill --pid=asd'" do
+        response = @parser.parse(%w(kill --pid=asd))
+        response.command.should == 'kill'
+        response.params['pid'].should == 'asd'
+        response.valid?.should be_false
+      end
+    end
+  end
+
   context "array" do
     context "on opt" do
       before(:each) {

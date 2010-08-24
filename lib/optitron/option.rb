@@ -1,7 +1,7 @@
 class Optitron
   class Option
-    attr_reader :inclusion_test
-    attr_accessor :required, :name, :default, :parameterize, :type, :desc, :has_default
+    attr_reader :inclusion_test, :type
+    attr_accessor :required, :name, :default, :parameterize, :desc, :has_default
     alias_method :required?, :required
     alias_method :has_default?, :has_default
     alias_method :parameterize?, :parameterize
@@ -19,6 +19,14 @@ class Optitron
     def inclusion_test=(tester)
       interpolate_type(tester.first)
       @inclusion_test = tester
+    end
+    
+    def type=(type)
+      @type = case type
+      when :int then :numeric
+      when :float, :numeric, :string, :array, :hash, :boolean, :greedy, nil then type
+      else raise("Unknown type #{type.inspect}")
+      end
     end
     
     def interpolate_type(default)
@@ -78,6 +86,8 @@ class Optitron
         Integer(val)
       when :array
         Array(val)
+      when :float
+        Float(val)
       when :hash
         val.is_a?(Hash) ? val : raise
       when :greedy, nil, :string
@@ -129,7 +139,7 @@ class Optitron
               tokens.delete_at(opt_tok_index).lit
             end
             response.params_array << [self, value.nil? ? !default : value]
-          when :numeric, :string
+          when :numeric, :string, :float
             value = if opt_tok.name == name
               if opt_tok.respond_to?(:value)
                 opt_tok.value

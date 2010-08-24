@@ -138,13 +138,16 @@ class Optitron
             optitron_dsl.root.cmd(cmd_name, cmd_desc) do
               opts.each { |o| opt *o }
               args.each do |(arg_name, arg_type, arg_default)|
+                possible_arg_type = arg_name.to_s[/_(string|hash|array|numeric|int|float)$/, 1]
+                possible_arg_type &&= possible_arg_type.to_sym
+                arg_opts = { :default => arg_default && eval(arg_default), :type => arg_types && arg_types.shift || possible_arg_type }
                 case arg_type
                 when :required
-                  arg arg_name.to_s, :default => arg_default && eval(arg_default), :type => arg_types && arg_types.shift
+                  arg arg_name.to_s, arg_opts
                 when :optional
-                  arg arg_name.to_s, :default => arg_default && eval(arg_default), :required => false, :type => arg_types && arg_types.shift
+                  arg arg_name.to_s, arg_opts.merge(:required => false)
                 when :greedy
-                  arg arg_name.to_s, :default => arg_default && eval(arg_default), :type => :greedy
+                  arg arg_name.to_s, arg_opts.merge(:type => :greedy)
                 end
               end
             end

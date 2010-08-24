@@ -102,6 +102,13 @@ Will produce the error <tt>Truth is invalid</tt>. Calling with
   
 however, will correctly invoke the method.
 
+These same arg type hints can be provided by ending your arguments in _type. The accepted types are: float, string, int, numeric, array, hash. For example
+
+  desc "Does something awesome"
+  def start(number_int, something_string, opt_boolean)
+    # ... does something
+  end
+
 
 === Options
 
