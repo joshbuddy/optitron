@@ -1,6 +1,6 @@
 = Optitron
 
-== Sensible options parsing
+== Sensible options parsing for Ruby!
 
 Optitron strives to be simple, minimal and to do the "right thing" most of the time. The structure is easy: you have global options, a list of commands, and each of those commands takes a number of arguments and options.
 
