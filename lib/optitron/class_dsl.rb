@@ -140,7 +140,10 @@ class Optitron
               opts.each { |o| opt *o }
               args.each do |(arg_name, arg_type, arg_default)|
                 possible_arg_type = arg_name.to_s[/_(string|hash|array|numeric|int|float)$/, 1]
-                possible_arg_type &&= possible_arg_type.to_sym
+                if possible_arg_type && (arg_types.nil? || !arg_types.first)
+                  possible_arg_type = possible_arg_type.to_sym
+                  arg_name = arg_name.to_s[/^(.*)_(?:string|hash|array|numeric|int|float)$/, 1]
+                end
                 arg_opts = { :default => arg_default && target.instance_eval(arg_default), :type => arg_types && arg_types.shift || possible_arg_type }
                 case arg_type
                 when :required

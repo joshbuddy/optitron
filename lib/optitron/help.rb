@@ -35,6 +35,9 @@ class Optitron
       if arg.default
         arg_line << "=#{arg.default.inspect}"
       end
+      if arg.type and !arg.greedy? and !arg.string?
+        arg_line << "(#{arg.type.to_s.upcase})"
+      end
       arg_line << (arg.required? ? ']' : '>')
       arg_line
     end

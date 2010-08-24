@@ -69,7 +69,7 @@ end
 describe "Optitron::Parser defaults" do
   it "should generate the correct help" do
     CLIExample.build
-    CLIExample.optitron_parser.help.strip.should == "Commands\n\nuse                                    # Use this\n  -u/--use_opt                         \nuse_too [one] <two=\"three\">            # Use this too\n  -a/--another_opt                     \nuse_greedy [one] <two1 two2 ...>       # Use this three\n  -A/--another_opt_as_well=[NUMERIC]   \nwith_array <ary=[1, 2, 3]>             # something with an array\n\nGlobal options\n\n-v/--verbose                           \n-?/--help                              # Print help message"
+    CLIExample.optitron_parser.help.strip.should == "Commands\n\nuse                                     # Use this\n  -u/--use_opt                          \nuse_too [one(HASH)] <two=\"three\">       # Use this too\n  -a/--another_opt                      \nuse_greedy [one] <two1 two2 ...>        # Use this three\n  -A/--another_opt_as_well=[NUMERIC]    \nwith_array <ary=[1, 2, 3]>              # something with an array\n\nGlobal options\n\n-v/--verbose                            \n-?/--help                               # Print help message"
   end
 
   it "should dispatch" do
@@ -91,6 +91,11 @@ describe "Optitron::Parser defaults" do
 
   it "should be able to suppress help" do
     capture(:stdout) { NoHelpExample.dispatch(%w(--help)) }.should == "Unknown command\nHelp is unrecognized\n"
+  end
+
+  it "should strip the type information from the names when its using the _type info" do
+    CLIExampleWithArgHinting.build
+    CLIExampleWithArgHinting.optitron_parser.help.strip.should == "Commands\n\nuse_too [one] [two(NUMERIC)]       # Use this too\n\nGlobal options\n\n-?/--help                          # Print help message"
   end
 
   it "should get type hinting from arg names" do
