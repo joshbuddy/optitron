@@ -35,6 +35,8 @@ class Optitron
         @type
       when false, true
         :boolean
+      when String
+        :string
       when Numeric
         :numeric
       when Array
@@ -139,7 +141,7 @@ class Optitron
               tokens.delete_at(opt_tok_index).lit
             end
             response.params_array << [self, value.nil? ? !default : value]
-          when :numeric, :string, :float
+          when :numeric, :string, :float, nil
             value = if opt_tok.name == name
               if opt_tok.respond_to?(:value)
                 opt_tok.value
