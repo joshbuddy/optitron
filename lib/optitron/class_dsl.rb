@@ -91,6 +91,7 @@ class Optitron
           @cmds << [m.to_s, @last_desc, @opts ? @opts.dup : []]
           @opts.clear if @opts
           @args.clear if @args
+          @last_desc = nil
         end
       end
       def optitron_parser

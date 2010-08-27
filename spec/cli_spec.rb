@@ -37,6 +37,9 @@ class CLIExample < Optitron::CLI
   desc "something with an array"
   def with_array(ary=[1,2,3])
   end
+  
+  def a_method_not_used
+  end
 end
 
 class AnotherCLIExample < Optitron::CLI
