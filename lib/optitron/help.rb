@@ -49,7 +49,7 @@ class Optitron
         cmd.args.each do |arg|
           cmd_line << " " << help_line_for_arg(arg)
         end
-        cmds << [cmd_line, cmd.desc]
+        cmds << [cmd_line, cmd]
         cmd.options.each do |opt|
           cmds.assoc(cmd_line) << help_line_for_opt(opt)
         end
@@ -72,8 +72,14 @@ class Optitron
         help_output << "Commands\n\n" + cmds.map do |(cmd, *opts)|
           cmd_text = ""
           cmd_text << "%-#{longest_line}s     " % cmd
-          cmd_desc = opts.shift
-          cmd_text << "# #{cmd_desc}" if cmd_desc
+          cmd_obj = opts.shift
+          cmd_text << "# #{cmd_obj.desc}" if cmd_obj.desc
+          cmd_obj.args.each do |arg|
+            if arg.desc
+              cmd_text << "\n%-#{longest_line}s     " % ""
+              cmd_text << "#   #{arg.name} -- #{arg.desc}"
+            end
+          end
           opts.each do |opt|
             cmd_text << "\n  %-#{longest_line}s   " % opt.first
             cmd_text << "# #{opt.last}" if opt.last
