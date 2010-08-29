@@ -62,5 +62,14 @@ class Optitron
     def valid?
       @errors.empty?
     end
+
+    def dispatch(target)
+      if valid?
+        target.params = params
+        target.send(command.to_sym, *args)
+      else
+        puts response.error_messages.join("\n")
+      end
+    end
   end
 end

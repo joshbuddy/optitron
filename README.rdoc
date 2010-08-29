@@ -232,3 +232,28 @@ If you try parsing invalid parameters, you can get back friendly error messages 
   => ["File is required"]
   @parser.parse(%w(kill --pid=something)).error_messages
   => ["Pid is invalid"]
+
+The response from #parse can also be used to dispatch. All that's required is the target object be able to respond to <tt>params=</tt>.
+
+For example
+
+  class Runner
+    attr_accessor :params
+    def install(file)
+      puts "I'm installing #{file} with #{params.inspect}"
+    end
+  end
+  
+  parser = Optitron.new {
+    help
+    opt 'verbose', "Be very loud"
+    cmd "install", "This installs things" do
+      arg "file", "The file to install"
+    end
+  }
+  
+  parser.parse(%w(install this_file -v)).dispatch(Runner.new)
+  
+Will output
+
+  I'm installing this_file with {"help"=>false, "verbose"=>true}
