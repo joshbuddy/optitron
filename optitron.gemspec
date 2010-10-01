@@ -15,11 +15,11 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "optitron"
 
-  s.add_dependency "ruby_parser", ">= 2.0"
-  s.add_dependency "callsite", "= 0.0.4"
-  s.add_dependency "ruby2ruby", "= 1.2.4"
-  s.add_dependency "sexp_processor", "= 3.0.4"
-  s.add_development_dependency "bundler", ">= 1.0.0.rc.3"
+  s.add_dependency "ruby_parser", "~> 2.0"
+  s.add_dependency "callsite", "~> 0.0.4"
+  s.add_dependency "ruby2ruby", "~> 1.2.4"
+  s.add_dependency "sexp_processor", "~> 3.0.4"
+  s.add_development_dependency "bundler", "~> 1.0.0"
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"
 
