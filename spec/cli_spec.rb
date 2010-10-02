@@ -77,6 +77,18 @@ class CLIExampleWithArgHinting < Optitron::CLI
   end
 end
 
+module Nested; end
+class Nested::NestedExample < Optitron::CLI
+
+  class_opt 'verbose'
+
+  desc "Use this too"
+  opt 'another_opt'
+  def use_too(one, two = 'three')
+    puts "using this too #{one} #{two} #{params['another_opt']} #{@env}"
+  end
+end
+
 
 describe "Optitron::Parser defaults" do
   it "should generate the correct help" do
@@ -116,6 +128,11 @@ describe "Optitron::Parser defaults" do
   
   it "should dispatch from within a module" do
     AModule::CLIInAModule.build
+    AModule::CLIInAModule.optitron_parser.help.should == "Commands\n\nmethod [arg1]       # a method\n\nGlobal options\n\n-?/--help           # Print help message"
+  end
+  
+  it "should dispatch from within a different sort of module" do
+    Nested::NestedExample.build
     AModule::CLIInAModule.optitron_parser.help.should == "Commands\n\nmethod [arg1]       # a method\n\nGlobal options\n\n-?/--help           # Print help message"
   end
 end

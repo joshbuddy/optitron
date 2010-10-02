@@ -25,9 +25,26 @@ class Optitron
 
     def process_class(exp)
       exp.shift
-      @current_class << exp.first.to_sym
-      process(exp)
-      @current_class.pop
+      current_class_size = @current_class.size
+      case exp.first
+      when Symbol
+        @current_class << exp.first.to_sym
+        process(exp)
+      else
+        if exp.first.first == :colon2
+          exp.first.shift
+          class_exp = exp.shift
+          class_exp[0, class_exp.size - 1].each do |const|
+            @current_class << const.last
+          end
+          @current_class << class_exp.last
+        else
+          raise
+        end
+        exp.shift
+        process(exp.first)
+      end
+      @current_class.slice!(current_class_size, @current_class.size)
       exp.clear
       exp
     end
