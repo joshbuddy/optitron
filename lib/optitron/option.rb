@@ -102,7 +102,7 @@ class Optitron
     end
 
     class Opt < Option
-      attr_accessor :short_name, :run, :parent_cmd, :include_in_params
+      attr_accessor :short_name, :run, :parent_cmd, :include_in_params, :use_no
       alias_method :include_in_params?, :include_in_params
       def initialize(name, desc = nil, opts = nil)
         if desc.is_a?(Hash)
@@ -115,15 +115,16 @@ class Optitron
         self.inclusion_test = opts[:in] if opts && opts[:in]
         self.required = opts && opts.key?(:required) ? opts[:required] : false
         self.default = opts && opts.key?(:default) ? opts[:default] : (@type == :boolean ? false : nil)
+        self.use_no = opts && opts.key?(:use_no) ? opts[:use_no] : false
       end
 
       def match?(tok)
-        tok.respond_to?(:name) and [name, short_name].include?(tok.name)
+        tok.respond_to?(:name) && (!use_no ? [name, short_name] : [name, short_name, "no-#{name}"]).include?(tok.name)
       end
 
       def find_matching_token(tokens)
         tokens.find do |t|
-          if t.respond_to?(:name) and (t.name == name or t.name == short_name)
+          if t.respond_to?(:name) and (t.name == name or t.name == short_name or t.name == "no-#{name}")
             t.respond_to?(:value) ^ (t.name == short_name)
           end
         end
@@ -135,7 +136,9 @@ class Optitron
           tokens.delete_at(opt_tok_index)
           case @type
           when :boolean
-            value = if opt_tok.respond_to?(:value)
+            value = if opt_tok.name == "no-#{name}"
+              default
+            elsif opt_tok.respond_to?(:value)
               opt_tok.value
             elsif opt_tok.name == short_name and tokens[opt_tok_index].respond_to?(:lit) and BOOLEAN_VALUES.include?(tokens[opt_tok_index].lit)
               tokens.delete_at(opt_tok_index).lit

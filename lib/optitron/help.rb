@@ -19,7 +19,7 @@ class Optitron
 
     def help_line_for_opt(opt)
       opt_line = ''
-      opt_line << [opt.short_name ? "-#{opt.short_name}" : nil, "--#{opt.name}"].compact.join('/')
+      opt_line << [opt.short_name ? "-#{opt.short_name}" : nil, opt.boolean? && opt.use_no ? "--(no-)#{opt.name}" : "--#{opt.name}"].compact.join('/')
       opt_line << "=[#{help_line_for_opt_value(opt)}]" unless opt.boolean?
       [opt_line, opt.desc]
     end

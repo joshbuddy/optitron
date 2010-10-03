@@ -168,6 +168,8 @@ This allows you to force an option to be required. False by default.
 
 This allows you to specify the type. Acceptable options are <tt>:numeric</tt>, <tt>:array</tt>, <tt>:hash</tt>, <tt>:string</tt> or <tt>:boolean</tt>.
 
+With boolean type, you can additionally supply <tt>:use_no => true</tt> to be able to use --no-option style options.
+
 == Stand alone usage
 
 You can create parsers and parse using them.
