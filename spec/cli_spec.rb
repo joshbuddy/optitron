@@ -114,7 +114,7 @@ describe "Optitron::Parser defaults" do
   end
 
   it "should be able to suppress help" do
-    capture(:stdout) { NoHelpExample.dispatch(%w(--help)) }.should == "Unknown command\nHelp is unrecognized\n"
+    capture(:stdout) { NoHelpExample.dispatch(%w(--help)) }.should == "Commands\n\nuse_too [one] <two=\"three\">       # Use this too\n  -a/--another_opt                \n\nGlobal options\n\n-v/--verbose                      \nUnknown command\nHelp is unrecognized\n"
   end
 
   it "should strip the type information from the names when its using the _type info" do

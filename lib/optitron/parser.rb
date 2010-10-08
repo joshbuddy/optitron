@@ -28,6 +28,7 @@ class Optitron
           options += @commands.assoc(cmd_tok.lit).last.options
           args = @commands.assoc(cmd_tok.lit).last.args
         else
+          puts @help.generate
           potential_cmd_toks.first ?
             response.add_error('an unknown command', potential_cmd_toks.first.lit) :
             response.add_error('unknown command')
