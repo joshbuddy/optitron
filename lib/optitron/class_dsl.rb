@@ -199,11 +199,13 @@ class Optitron
           optitron_parser.target.params = response.params
           args = response.args
           while (args.size < optitron_parser.commands.assoc(response.command).last.args.size)
-            args << optitron_parser.commandsassoc(response.command).last.args[args.size].default
+            args << optitron_parser.commands.assoc(response.command).last.args[args.size].default
           end
           optitron_parser.target.send(response.command.to_sym, *response.args)
         else
-          puts response.error_messages.join("\n")
+          unless response.args.empty?
+            puts response.error_messages.join("\n")
+          end
         end
       end
     end

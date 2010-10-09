@@ -101,7 +101,7 @@ describe "Optitron::Parser defaults" do
   end
 
   it "should display help when there is no args" do
-    capture(:stdout) { CLIExample.dispatch([])}.should == "Commands\n\nuse                                     # Use this\n  -u/--use_opt                          \nuse_too [one(HASH)] <two=\"three\">       # Use this too\n  -a/--another_opt                      \nuse_greedy [one] <two1 two2 ...>        # Use this three\n  -A/--another_opt_as_well=[NUMERIC]    \nwith_array <ary=[1, 2, 3]>              # something with an array\n\nGlobal options\n\n-v/--verbose                            \n-?/--help                               # Print help message\nUnknown command\n"
+    capture(:stdout) { CLIExample.dispatch([])}.should == "Commands\n\nuse                                     # Use this\n  -u/--use_opt                          \nuse_too [one(HASH)] <two=\"three\">       # Use this too\n  -a/--another_opt                      \nuse_greedy [one] <two1 two2 ...>        # Use this three\n  -A/--another_opt_as_well=[NUMERIC]    \nwith_array <ary=[1, 2, 3]>              # something with an array\n\nGlobal options\n\n-v/--verbose                            \n-?/--help                               # Print help message\n"
   end
 
 
@@ -119,7 +119,7 @@ describe "Optitron::Parser defaults" do
   end
 
   it "should be able to suppress help" do
-    capture(:stdout) { NoHelpExample.dispatch(%w(--help)) }.should == "Commands\n\nuse_too [one] <two=\"three\">       # Use this too\n  -a/--another_opt                \n\nGlobal options\n\n-v/--verbose                      \nUnknown command\nHelp is unrecognized\n"
+    capture(:stdout) { NoHelpExample.dispatch(%w(--help)) }.should == "Commands\n\nuse_too [one] <two=\"three\">       # Use this too\n  -a/--another_opt                \n\nGlobal options\n\n-v/--verbose                      \n"
   end
 
   it "should strip the type information from the names when its using the _type info" do

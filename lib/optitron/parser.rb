@@ -15,8 +15,8 @@ class Optitron
       @help.generate
     end
 
-    def parse(args = ARGV)
-      tokens = Tokenizer.new(self, args).tokens
+    def parse(argv = ARGV)
+      tokens = Tokenizer.new(self, argv).tokens
       response = Response.new(self, tokens)
       options = @options 
       args = @args
@@ -28,7 +28,7 @@ class Optitron
           options += @commands.assoc(cmd_tok.lit).last.options
           args = @commands.assoc(cmd_tok.lit).last.args
         else
-          puts @help.generate
+          puts help
           potential_cmd_toks.first ?
             response.add_error('an unknown command', potential_cmd_toks.first.lit) :
             response.add_error('unknown command')
