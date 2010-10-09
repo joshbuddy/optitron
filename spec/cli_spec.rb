@@ -100,6 +100,11 @@ describe "Optitron::Parser defaults" do
     capture(:stdout) { CLIExample.dispatch(%w(use))}.should == "using this\n"
   end
 
+  it "should display help when there is no args" do
+    capture(:stdout) { CLIExample.dispatch([])}.should == "Commands\n\nuse                                     # Use this\n  -u/--use_opt                          \nuse_too [one(HASH)] <two=\"three\">       # Use this too\n  -a/--another_opt                      \nuse_greedy [one] <two1 two2 ...>        # Use this three\n  -A/--another_opt_as_well=[NUMERIC]    \nwith_array <ary=[1, 2, 3]>              # something with an array\n\nGlobal options\n\n-v/--verbose                            \n-?/--help                               # Print help message\nUnknown command\n"
+  end
+
+
   it "should dispatch with the type hinting" do
     capture(:stdout) { CLIExample.dispatch(%w(use_too one:two three:four))}.should == 'one: [["one", "two"], ["three", "four"]] "three"' + "\n"
   end
