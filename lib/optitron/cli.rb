@@ -3,4 +3,3 @@ class Optitron
     include ClassDsl
   end
 end
-    

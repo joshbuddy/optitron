@@ -54,10 +54,8 @@ class Optitron
           cmds.assoc(cmd_line) << help_line_for_opt(opt)
         end
       end
-      opts_lines = @parser.options.map do |opt|
-        help_line_for_opt(opt)
-      end
-
+      cmds.sort!{ |cmd1, cmd2| (cmd1[1].group || '') <=> (cmd2[1].group || '') }
+      opts_lines = @parser.options.map { |opt| help_line_for_opt(opt) }
       args_lines = @parser.args.empty? ? nil : [@parser.args.map{|arg| help_line_for_arg(arg)}.join(' '), @parser.args.map{|arg| arg.desc}.join(', ')]
 
       longest_line = 0
@@ -68,11 +66,17 @@ class Optitron
       longest_line = [opts_lines.map{|o| o.first.size}.max, longest_line].max unless opts_lines.empty?
       help_output = []
 
+      last_group = nil
+
       unless cmds.empty?
         help_output << "Commands\n\n" + cmds.map do |(cmd, *opts)|
           cmd_text = ""
-          cmd_text << "%-#{longest_line}s     " % cmd
           cmd_obj = opts.shift
+          if last_group != cmd_obj.group
+            cmd_text << "#{cmd_obj.group}:\n"
+            last_group = cmd_obj.group
+          end
+          cmd_text << "%-#{longest_line}s     " % cmd
           cmd_text << "# #{cmd_obj.desc}" if cmd_obj.desc
           cmd_obj.args.each do |arg|
             if arg.desc

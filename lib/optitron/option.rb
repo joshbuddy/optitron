@@ -1,7 +1,7 @@
 class Optitron
   class Option
     attr_reader :inclusion_test, :type
-    attr_accessor :required, :name, :default, :parameterize, :desc, :has_default
+    attr_accessor :required, :name, :default, :parameterize, :desc, :has_default, :group
     alias_method :required?, :required
     alias_method :has_default?, :has_default
     alias_method :parameterize?, :parameterize
@@ -112,6 +112,7 @@ class Optitron
         self.type = opts && opts[:type] || :boolean
         self.short_name = opts[:short_name] if opts && opts[:short_name]
         self.run = opts[:run] if opts && opts[:run]
+        self.group = opts[:group] if opts && opts[:group]
         self.inclusion_test = opts[:in] if opts && opts[:in]
         self.required = opts && opts.key?(:required) ? opts[:required] : false
         self.default = opts && opts.key?(:default) ? opts[:default] : (@type == :boolean ? false : nil)
@@ -191,6 +192,7 @@ class Optitron
         end
         @name, @desc = name, desc
         @run = opts[:run] if opts && opts[:run]
+        @group = opts[:group] if opts && opts[:group]
         @options = []
         @args = []
       end
@@ -205,6 +207,7 @@ class Optitron
         @name, @desc = name, desc
         self.inclusion_test = opts[:in] if opts && opts[:in]
         self.default = opts && opts[:default]
+        self.group = opts[:group] if opts && opts[:group]
         self.type = opts && opts[:type]
         self.required = opts && opts.key?(:required) ? opts[:required] : (@default.nil? and !greedy?)
       end

@@ -109,6 +109,7 @@ class Optitron
           @opts.clear if @opts
           @args.clear if @args
           @last_desc = nil
+          @last_group = nil
         end
       end
       def optitron_parser
@@ -147,6 +148,10 @@ class Optitron
       def desc(desc)
         build_method_args(Callsite.parse(caller.first).filename)
         @last_desc = desc
+      end
+
+      def group(group)
+        @last_group = group
       end
 
       def opt(name, desc = nil, opts = nil)
