@@ -27,6 +27,20 @@ class Optitron
           response.command = cmd_tok.lit
           options += @commands.assoc(cmd_tok.lit).last.options
           args = @commands.assoc(cmd_tok.lit).last.args
+        elsif @target.respond_to?(:command_missing)
+          command = potential_cmd_toks.first.lit
+          response.command = 'command_missing'
+          @commands << [response.command, Option::Cmd.new(response.command)]
+          @commands.assoc(response.command).last.options.insert(-1, *tokens.select { |t| !t.respond_to?(:lit) }.map { |t|
+            t.is_a?(Tokenizer::Named) ?
+              Option::Opt.new(t.name, nil, :short_name => t.name) :
+              Option::Opt.new(t.name, nil, :type => (t.value ? :string : :boolean))
+          })
+          @commands.assoc(response.command).last.args <<
+            Option::Arg.new('command', 'Command name', :type => :string) <<
+            Option::Arg.new('args', 'Command arguments', :type => :greedy)
+          options += @commands.assoc(response.command).last.options
+          args = @commands.assoc(response.command).last.args
         else
           puts help
           potential_cmd_toks.first ?
