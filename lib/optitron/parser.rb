@@ -27,7 +27,7 @@ class Optitron
           response.command = cmd_tok.lit
           options += @commands.assoc(cmd_tok.lit).last.options
           args = @commands.assoc(cmd_tok.lit).last.args
-        elsif @target.respond_to?(:command_missing)
+        elsif !potential_cmd_toks.empty? && @target.respond_to?(:command_missing)
           command = potential_cmd_toks.first.lit
           response.command = 'command_missing'
           @commands << [response.command, Option::Cmd.new(response.command)]
