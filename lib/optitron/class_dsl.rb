@@ -203,8 +203,9 @@ class Optitron
         if response.valid?
           optitron_parser.target.params = response.params
           args = response.args
-          while (args.size < optitron_parser.commands.assoc(response.command).last.args.size)
-            args << optitron_parser.commands.assoc(response.command).last.args[args.size].default
+          parser_args = optitron_parser.commands.assoc(response.command).last.args
+          while (args.size < parser_args.size && !(parser_args[args.size].type == :greedy && parser_args[args.size].default.nil?))
+            args << parser_args[args.size].default 
           end
 
           optitron_parser.target.send(response.command.to_sym, *response.args)
