@@ -16,6 +16,10 @@ describe "Optitron::Parser options" do
       @parser.parse(%w(--option=test)).params.should == {'option' => 'test'}
     end
 
+    it "should parse '--option=\"test -testing\"'" do
+      @parser.parse(['--option=test -testing']).params.should == {'option' => 'test -testing'}
+    end
+
     it "shouldn't parse '--option test'" do
       @parser.parse(%w(--option test)).valid?.should be_false
     end
