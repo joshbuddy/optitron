@@ -110,7 +110,7 @@ describe "Optitron::Parser defaults" do
   end
 
   it "should generate the correct help" do
-    AnotherCLIExample.build
+    AnotherCLIExample.build { AnotherCLIExample.new("test") }
     AnotherCLIExample.optitron_parser.help.strip.should == "Commands\n\nuse_too [one] <two=\"three\">       # Use this too\n  -a/--another_opt                \n\nGlobal options\n\n-v/--verbose                      \n-?/--help                         # Print help message"
   end
 

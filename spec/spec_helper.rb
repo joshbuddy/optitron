@@ -1,5 +1,6 @@
 $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 require 'optitron'
+require 'phocus'
 
 class Object
   def capture(stream)
