@@ -68,7 +68,7 @@ class Optitron
         target.params = params
         target.send(command.to_sym, *args)
       else
-        puts response.error_messages.join("\n")
+        puts error_messages.join("\n")
       end
     end
   end
