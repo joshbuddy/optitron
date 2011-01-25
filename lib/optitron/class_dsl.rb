@@ -1,5 +1,5 @@
 require 'callsite'
-require 'method_args'
+require 'parameters_extra'
 
 class Optitron
   
@@ -45,7 +45,7 @@ class Optitron
       end
 
       def desc(desc)
-        MethodArgs.register(Callsite.parse(caller.first).filename)
+        ParametersExtra.register(Callsite.parse(caller.first).filename)
         @last_desc = desc
       end
 
@@ -73,7 +73,7 @@ class Optitron
             optitron_dsl.root.cmd(cmd_name, cmd_desc) do
               opts.each { |o| opt *o }
               puts "!!! #{cmd_name.inspect}" if method.nil?
-              method.args.each do |arg|
+              method.parameters_extra.each do |arg|
                 possible_arg_type = arg.name.to_s[/_(string|hash|array|numeric|int|float)$/, 1]
                 arg_name = if possible_arg_type && (arg_types.nil? || !arg_types.first)
                   possible_arg_type = possible_arg_type.to_sym

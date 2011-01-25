@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project         = "optitron"
 
   s.add_dependency "callsite", "~> 0.0.4"
-  s.add_dependency "method-args", "~> 0.1.0"
+  s.add_dependency "parameters_extra", "~> 0.2.0"
   s.add_development_dependency "bundler", "~> 1.0.0"
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"

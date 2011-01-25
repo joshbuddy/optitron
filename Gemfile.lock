@@ -1,15 +1,15 @@
 PATH
   remote: .
   specs:
-    optitron (0.3.0)
+    optitron (0.3.1)
       callsite (~> 0.0.4)
-      method-args (~> 0.1.0)
+      parameters_extra (~> 0.2.0)
 
 GEM
   remote: http://rubygems.org/
   specs:
     callsite (0.0.4)
-    method-args (0.1.0)
+    parameters_extra (0.2.0)
       ruby2ruby (~> 1.2.4)
       ruby_parser (~> 2.0)
       sexp_processor (~> 3.0.4)
@@ -29,8 +29,8 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.0.0)
   callsite (~> 0.0.4)
-  method-args (~> 0.1.0)
   optitron!
+  parameters_extra (~> 0.2.0)
   phocus
   rake
   rspec
