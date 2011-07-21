@@ -12,14 +12,14 @@ class Optitron
 
     def tokenize
       unless @tokens
-        @tokens = @opts.map {|t|
+        @tokens = @opts.map do |t|
           case t
           when /^--([^-][^=]+)=([^=]+)$/ then NamedWithValue.new($1, $2)
           when /^--([^-][^=]+)$/         then NamedWithValue.new($1, nil)
           when /^-(.*)/                  then find_names_values($1)
           else                                Value.new(t)
           end
-        }
+        end
         @tokens.flatten!
       end
     end
